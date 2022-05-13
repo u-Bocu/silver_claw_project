@@ -3,18 +3,6 @@
 
 *.TAG
 
-invisible_mouse/target/rls/.rustc_info.json
-
-invisible_mouse/target/rls/debug/.cargo-lock
-
-invisible_mouse/target/rls/debug/.fingerprint/invisible_mouse-4f504da468b16c05/bin-invisible_mouse
-
-invisible_mouse/target/rls/debug/.fingerprint/invisible_mouse-4f504da468b16c05/bin-invisible_mouse.json
-
-invisible_mouse/target/rls/debug/.fingerprint/invisible_mouse-4f504da468b16c05/dep-bin-invisible_mouse
-
-invisible_mouse/target/rls/debug/.fingerprint/invisible_mouse-4f504da468b16c05/
-
 invisible_mouse/target
 
 invisible_mouse_installer/target
