@@ -15,6 +15,7 @@ class hand_detector():
         self._mpHands = mp.solutions.hands
         self._hands = self._mpHands.Hands(static_image_mode = self._mode,
                                          max_num_hands = self._maxHands, 
+                                         model_complexity = 0,
                                          min_detection_confidence = self._detectionCon, 
                                          min_tracking_confidence = self._trackCon)
 
@@ -22,8 +23,9 @@ class hand_detector():
 
     def get_landmarks(self):
         success, img = self._capture.read()
+        imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
-        self._results = self._hands.process(img)
+        self._results = self._hands.process(imgRGB)
         return self._results.multi_hand_landmarks
 
     def draw_landmarks(self, img = 0, handNo = 0, draw = True):
@@ -38,7 +40,7 @@ class hand_detector():
 
             for id, lm in enumerate(hand.landmark):
                 h, w, c = img.shape
-                cx, cy = int(lm.x * w), int(lm.y * h)
+                cx, cy = int(w - lm.x * w), int(lm.y * h)
 
                 if draw:
                     cv2.circle(img, (cx, cy), 3, (255 - i, 0 + i, 255 - i), cv2.FILLED)

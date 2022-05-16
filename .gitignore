@@ -7,4 +7,6 @@ invisible_mouse/target
 
 invisible_mouse_installer/target
 
+test_python_rust/target
+
 *_pycache_
