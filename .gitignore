@@ -6,3 +6,5 @@
 invisible_mouse/target
 
 invisible_mouse_installer/target
+
+*_pycache_
