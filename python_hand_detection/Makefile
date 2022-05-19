@@ -6,13 +6,13 @@ CFLAGS=-I$(IDIR)
 ODIR=obj
 LDIR=lib
 
-_DLLS=C:/Users/mremond/AppData/Local/Programs/Python/Python310/libs
+_DLLS=C:/Users/mremond/AppData/Local/Programs/Python/Python310
 DLLS=-L$(_DLLS)
 
 LIBS=-lpython310
 MUNICODE=-municode
 
-_OBJ = main.o 
+_OBJ = main.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 
