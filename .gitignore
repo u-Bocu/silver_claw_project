@@ -3,10 +3,13 @@
 
 *.TAG
 
-invisible_mouse/target
+*/target
 
-invisible_mouse_installer/target
+*/obj
 
-test_python_rust/target
+*/lib
 
 *_pycache_
+
+*.vscode
+*foo.txt
