@@ -7,6 +7,8 @@ use anyhow::{
     Error,
 };
 
+use enigo::*;
+
 use windows_service::{
     define_windows_service,
     service_dispatcher,
@@ -79,13 +81,19 @@ fn run_service(_arguments: Vec<OsString>) -> Result<(), Error> {
     // Tell the system that the service is running now
     status_handle.set_service_status(next_status)?;
 
-    // Do your thing
+    // Init
+    let mut e = Enigo::new();
 
     loop { // Infinite main loop
 
+        let x = 1;
+        let y = 2;
+
+        e.mouse_move_to(x, y);
+
         match shutdown_rx.recv_timeout(Duration::from_micros(1)) {
             Ok(_) | Err(mpsc::RecvTimeoutError::Disconnected) => break,
-            Err(mpsc::RecvTimeoutError::Timeout) => () , 
+            Err(mpsc::RecvTimeoutError::Timeout) => (),
         };
     }
 

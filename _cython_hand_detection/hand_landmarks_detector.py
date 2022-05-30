@@ -28,12 +28,11 @@ class hand_detector():
         self._results = self._hands.process(imgRGB)
         return self._results.multi_hand_landmarks
 
-    def draw_landmarks(self, img = 0, handNo = 0):
+    def draw_landmarks(self, img = 0, handNo = 0, draw = True):
         self.get_landmarks()
 
         if img == 0:
             img = np.zeros((IMG_HEIGH, IMG_WIDTH, 3), np.uint8)
-            img.flags.writeable = False # Make it a constant reference for performance purposes
 
         if self._results.multi_hand_landmarks:
             hand = self._results.multi_hand_landmarks[handNo]
@@ -43,9 +42,11 @@ class hand_detector():
                 h, w, c = img.shape
                 cx, cy = int(w - lm.x * w), int(lm.y * h)
 
-                cv2.circle(img, (cx, cy), 3, (255 - i, 0 + i, 255 - i), cv2.FILLED)
-                i += 20
-        
+                if draw:
+                    cv2.circle(img, (cx, cy), 3, (255 - i, 0 + i, 255 - i), cv2.FILLED)
+                    i += 20
+
+        img.flags.writeable = False # Make it a constant reference for performance purposes
         return img
 
     def print_landmarks(self):
