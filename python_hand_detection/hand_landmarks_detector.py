@@ -5,6 +5,10 @@ import cv2
 IMG_HEIGH = 150
 IMG_WIDTH = 150
 
+def start():
+    hd = hand_detector()
+    return hd.get_landmarks()
+
 class hand_detector():
     def __init__(self, mode = False, max_hands = 1, detection_con = 0.5, track_con = 0.5) -> None:
         self._mode = mode
@@ -26,7 +30,17 @@ class hand_detector():
         imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
         self._results = self._hands.process(imgRGB)
-        return self._results.multi_hand_landmarks
+
+        landmarks = None
+        if self._results.multi_hand_landmarks:
+            hand = self._results.multi_hand_landmarks[0]
+            landmarks = []
+
+            for id, lm in enumerate(hand.landmark):
+                landmarks.append((lm.x, lm.y, lm.z))
+
+        #print(landmarks)
+        return landmarks
 
     def draw_landmarks(self, img = 0, handNo = 0):
         self.get_landmarks()
