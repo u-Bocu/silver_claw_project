@@ -6,6 +6,8 @@ use pyo3::py_run;
 mod hand_detector;
 
 fn main() -> PyResult<()> {
+
+    // Init
     pyo3::prepare_freethreaded_python();
     Python::with_gil(|py| {
         let locals = [("hand_landmarks_detector", py.import("hand_landmarks_detector")?)].into_py_dict(py);
@@ -14,13 +16,20 @@ fn main() -> PyResult<()> {
 
         let code = "hd.get_landmarks()";
 
-        let res: &hand_detector::hand_state = &hand_detector::hand_state {
+        let mut hand: hand_detector::hand_state = hand_detector::hand_state {
             _thumb_pos: (0.0, 0.0),
             _gesture: hand_detector::gesture::none,
         };
         
+        // Main Loop
         loop {
-            hand_detector::get_hand_state(py.eval(code, None, Some(&locals))?.extract()?, res)?;
+            hand_detector::get_hand_state(py.eval(code, None, Some(&locals))?.extract()?, &mut hand)?;
+
+            match hand._gesture {
+                hand_detector::gesture::open => (),
+                hand_detector::gesture::closed => (),
+                hand_detector::gesture::none => (),
+            }
         }
     })
 }
