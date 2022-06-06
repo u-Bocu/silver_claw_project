@@ -15,6 +15,8 @@ pub enum gesture {
     open,
     closed,
     none,
+    thumb_index_pinched,
+    thumb_middle_pinched,
 }
     
 pub struct hand_state {
@@ -22,7 +24,7 @@ pub struct hand_state {
     pub _gesture: gesture,
 }
 
-pub fn get_hand_state(landmarks: &PyAny, mut _hand_state: &hand_state) -> PyResult<()> {
+pub fn get_hand_state(landmarks: &PyAny, mut _hand_state: &mut hand_state) -> PyResult<()> {
     if landmarks.downcast::<PyList>().is_ok() {
 
         let landmarks: &PyList = landmarks.downcast()?;
@@ -30,14 +32,17 @@ pub fn get_hand_state(landmarks: &PyAny, mut _hand_state: &hand_state) -> PyResu
         let landmarks_coordinates: Vec<(f32, f32, f32)> = landmarks.extract::<Vec<(f32, f32, f32)>>()?;
 
         //println!("{:?}", landmarks_coordinates);
-
-        let c: (f32, f32) = (landmarks_coordinates[4].0, landmarks_coordinates[4].1);
-
-        _hand_state = &hand_state {
-            _thumb_pos: &c,
-            _gesture: gesture::none,
-        };
+        _hand_state._thumb_pos = compute_thumb_pos(&landmarks_coordinates);
+        _hand_state._gesture = compute_gesture(&landmarks_coordinates);
     }
 
     Ok(())
+}
+
+fn compute_thumb_pos(landmarks_coordinates: &Vec<(f32, f32, f32)>) -> (f32, f32) {
+    (landmarks_coordinates[4].0, landmarks_coordinates[4].1)
+}
+
+fn compute_gesture(landmarks_coordinates: &Vec<(f32, f32, f32)>) -> gesture {
+    gesture::none
 }
