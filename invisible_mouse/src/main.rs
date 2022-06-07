@@ -86,10 +86,7 @@ fn run_service(_arguments: Vec<OsString>) -> Result<(), Error> {
 
     loop { // Infinite main loop
 
-        let x = 1;
-        let y = 2;
-
-        e.mouse_move_to(x, y);
+        
 
         match shutdown_rx.recv_timeout(Duration::from_micros(1)) {
             Ok(_) | Err(mpsc::RecvTimeoutError::Disconnected) => break,
