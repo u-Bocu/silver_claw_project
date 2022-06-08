@@ -1,3 +1,5 @@
+use enigo::*;
+
 use pyo3::prelude::*;
 use pyo3::py_run;
 use pyo3::types::IntoPyDict;
@@ -18,23 +20,53 @@ fn main() -> PyResult<()> {
 
         let code = "hd = hand_landmarks_detector.hand_detector()";
         py_run!(py, *locals, code);
-
         let code = "hd.get_landmarks()";
 
-        let remanant_images: circular_buffer::circular_buffer =
+        let mut e = Enigo::new();
+
+        let mut remanant_images: circular_buffer::circular_buffer =
             circular_buffer::circular_buffer::default();
+
+        let previous_hand =
+            hand_detector::get_hand_state(py.eval(code, None, Some(&locals))?.extract()?)?;
 
         // Main Loop
         loop {
             let hand =
                 hand_detector::get_hand_state(py.eval(code, None, Some(&locals))?.extract()?)?;
 
+            // Use a circular buffer to filter high frequencies with median filter
+            remanant_images.append(hand._thumb_pos);
+            let hand_position: (i32, i32) = remanant_images.median_filter()?;
+
+            if hand_detector::has_gesture_changed(hand, previous_hand)? {
+                match hand._gesture {
+                    hand_detector::gesture::open => (),
+                    hand_detector::gesture::closed => (),
+                    hand_detector::gesture::none => (),
+                    hand_detector::gesture::thumb_index_pinched => {
+                        e.mouse_up(MouseButton::Left);
+                    }
+                    hand_detector::gesture::thumb_middle_pinched => {
+                        e.mouse_up(MouseButton::Right);
+                    }
+                    hand_detector::gesture::void => (),
+                }
+            }
+
             match hand._gesture {
                 hand_detector::gesture::open => (),
                 hand_detector::gesture::closed => (),
-                hand_detector::gesture::none => (),
-                hand_detector::gesture::thumb_index_pinched => (),
-                hand_detector::gesture::thumb_middle_pinched => (),
+                hand_detector::gesture::none => {
+                    e.mouse_move_to(hand_position.0, hand_position.1);
+                }
+                hand_detector::gesture::thumb_index_pinched => {
+                    e.mouse_down(MouseButton::Left);
+                }
+                hand_detector::gesture::thumb_middle_pinched => {
+                    e.mouse_down(MouseButton::Right);
+                }
+                hand_detector::gesture::void => (),
             }
         }
     })

@@ -12,6 +12,7 @@ opt-level = 3
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+enigo = "0.0.14"
 
 [dependencies.pyo3]
 version = "0.16.5"
