@@ -36,11 +36,14 @@ fn main() -> PyResult<()> {
                 hand_detector::get_hand_state(py.eval(code, None, Some(&locals))?.extract()?)?;
 
             // Use a circular buffer to filter high frequencies with median filter
-            remanant_images.append(hand._thumb_pos);
-            let hand_position: (i32, i32) = remanant_images.median_filter()?;
+            remanant_images.append(hand._wrist_pos);
+            let hand_position: (i32, i32) = remanant_images.median_filter();
 
-            if hand_detector::has_gesture_changed(hand, previous_hand)? {
-                match hand._gesture {
+            println!("{:?}", hand._gesture);
+            println!("{:?}", previous_hand._gesture);
+
+            if hand_detector::has_gesture_changed(hand, previous_hand) {
+                match previous_hand._gesture {
                     hand_detector::gesture::open => (),
                     hand_detector::gesture::closed => (),
                     hand_detector::gesture::none => (),

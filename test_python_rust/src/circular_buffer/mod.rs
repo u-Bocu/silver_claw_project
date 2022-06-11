@@ -4,9 +4,9 @@
 #![allow(non_camel_case_types)]
 #![warn(non_snake_case)]
 
-use pyo3::prelude::*;
+use math::round;
 
-const DATA_MAX_SIZE: usize = 3;
+const DATA_MAX_SIZE: usize = 4;
 
 pub struct circular_buffer {
     _data: Vec<(i32, i32)>,
@@ -37,7 +37,7 @@ impl circular_buffer {
     }
 
     #[inline(always)]
-    pub fn median_filter(&mut self) -> PyResult<(i32, i32)> {
+    pub fn mean_filter(&mut self) -> (i32, i32) {
         let mut sum: (i32, i32) = (0i32, 0i32);
 
         for data in &self._data {
@@ -48,7 +48,19 @@ impl circular_buffer {
         let size: i32 = self._data.len() as i32;
         let res: (i32, i32) = (sum.0 / size, sum.1 / size);
 
-        Ok(res)
+        res
+    }
+
+    pub fn median_filter(&mut self) -> (i32, i32) {
+        let mut x: Vec<i32> = Vec::with_capacity(self._data.len());
+        let mut y: Vec<i32> = Vec::with_capacity(self._data.len());
+
+        for data in &self._data {
+            x.push(data.0);
+            y.push(data.1);
+        }
+
+        (array_median(&mut x), array_median(&mut y))
     }
 }
 
@@ -58,5 +70,15 @@ impl Default for circular_buffer {
             _data: Vec::with_capacity(DATA_MAX_SIZE),
             _index: 0usize,
         }
+    }
+}
+
+fn array_median(v: &mut Vec<i32>) -> i32 {
+    v.sort();
+
+    if v.len() % 2 == 0 {
+        (v[((v.len() / 2) - 1) as usize] + v[(v.len() / 2) as usize]) / 2
+    } else {
+        v[round::floor((v.len() / 2) as f64, 0i8) as usize]
     }
 }

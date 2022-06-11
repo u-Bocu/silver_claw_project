@@ -5,6 +5,8 @@
 #![allow(non_camel_case_types)]
 #![warn(non_snake_case)]
 
+use winapi::um::winuser;
+
 use pyo3::prelude::*;
 use pyo3::types::{PyAny, PyList};
 
@@ -23,7 +25,7 @@ pub enum gesture {
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub struct hand_state {
-    pub _thumb_pos: (i32, i32),
+    pub _wrist_pos: (i32, i32),
     pub _gesture: gesture,
 }
 
@@ -37,12 +39,12 @@ pub fn get_hand_state(landmarks: &PyAny) -> PyResult<hand_state> {
         //println!("{}", landmarks);
 
         Ok(hand_state {
-            _thumb_pos: compute_thumb_pos(&landmarks_coordinates),
+            _wrist_pos: compute_wrist_pos(&landmarks_coordinates),
             _gesture: compute_gesture(&landmarks_coordinates),
         })
     } else {
         Ok(hand_state {
-            _thumb_pos: (0i32, 0i32),
+            _wrist_pos: (0i32, 0i32),
             _gesture: gesture::void,
         })
     }
@@ -53,35 +55,39 @@ pub fn get_hand_state(landmarks: &PyAny) -> PyResult<hand_state> {
  * Returns true is the gesture has changed between h0 and h1.
  */
 #[inline(always)]
-pub fn has_gesture_changed(h0: hand_state, h1: hand_state) -> PyResult<bool> {
-    if h0._gesture == h1._gesture {
-        Ok(false)
+pub fn has_gesture_changed(h0: hand_state, h1: hand_state) -> bool {
+    if h0._gesture == h1._gesture || h0._gesture == gesture::void || h1._gesture == gesture::void {
+        false
     } else {
-        Ok(true)
+        true
     }
 }
 
-const TRUNCATURE_SIZE: i32 = 5i32;
+const TRUNCATURE_SIZE: i32 = 10i32;
+const X_SPEED_MULTIPLICATOR: f32 = 1f32;
+const Y_SPEED_MULTIPLICATOR: f32 = 1f32;
 
 /**
  * Returns the position where the mouse should be placed on the screen,
  * according to the thumb position on the image.
  */
-fn compute_thumb_pos(landmarks_coordinates: &Vec<(f32, f32, f32)>) -> (i32, i32) {
+fn compute_wrist_pos(landmarks_coordinates: &Vec<(f32, f32, f32)>) -> (i32, i32) {
+    let screen_width = unsafe { winuser::GetSystemMetrics(winuser::SM_CXSCREEN) } as f32;
+    let screen_height = unsafe { winuser::GetSystemMetrics(winuser::SM_CYSCREEN) } as f32;
     // Truncate thumb position to filter white noise.
     let c: (f32, f32) = (
-        (landmarks_coordinates[4].0 / 2f32.powi(TRUNCATURE_SIZE)) * 2f32.powi(TRUNCATURE_SIZE),
-        (landmarks_coordinates[4].1 / 2f32.powi(TRUNCATURE_SIZE)) * 2f32.powi(TRUNCATURE_SIZE),
+        (landmarks_coordinates[0].0 / 2f32.powi(TRUNCATURE_SIZE)) * 2f32.powi(TRUNCATURE_SIZE),
+        (landmarks_coordinates[0].1 / 2f32.powi(TRUNCATURE_SIZE)) * 2f32.powi(TRUNCATURE_SIZE),
     );
 
     let res: (i32, i32) = (
-        (SCREEN_WIDTH - c.0 * SCREEN_WIDTH) as i32,
-        (c.1 * SCREEN_HEIGHT) as i32,
+        ((screen_width - c.0 * screen_width) / X_SPEED_MULTIPLICATOR) as i32,
+        (c.1 * screen_height / Y_SPEED_MULTIPLICATOR) as i32,
     );
     res
 }
 
-const FINGER_DISTANCE_RATIO: f32 = 3f32;
+const FINGER_DISTANCE_RATIO: f32 = 2f32;
 
 /**
  * Returns the hand gesture recognized with geometry.
