@@ -10,9 +10,6 @@ use winapi::um::winuser;
 use pyo3::prelude::*;
 use pyo3::types::{PyAny, PyList};
 
-const SCREEN_HEIGHT: f32 = 768f32;
-const SCREEN_WIDTH: f32 = 1366f32;
-
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub enum gesture {
     open,
@@ -68,12 +65,36 @@ const X_SPEED_MULTIPLICATOR: f32 = 1f32;
 const Y_SPEED_MULTIPLICATOR: f32 = 1f32;
 
 /**
+ * Screen dimensions singleton.
+ *
+ * /!\ Windows only for now
+ */
+
+struct screen_info {
+    _dimensions: Option<(f32, f32)>,
+}
+
+static mut SCREEN_INFO: screen_info = screen_info { _dimensions: None };
+
+/**
  * Returns the position where the mouse should be placed on the screen,
  * according to the thumb position on the image.
  */
 fn compute_wrist_pos(landmarks_coordinates: &Vec<(f32, f32, f32)>) -> (i32, i32) {
-    let screen_width = unsafe { winuser::GetSystemMetrics(winuser::SM_CXSCREEN) } as f32;
-    let screen_height = unsafe { winuser::GetSystemMetrics(winuser::SM_CYSCREEN) } as f32;
+    unsafe {
+        match SCREEN_INFO._dimensions {
+            Some(_a) => (),
+            None => {
+                SCREEN_INFO._dimensions = Some((
+                    winuser::GetSystemMetrics(winuser::SM_CXSCREEN) as f32,
+                    winuser::GetSystemMetrics(winuser::SM_CYSCREEN) as f32,
+                ));
+            }
+        }
+    }
+
+    let screen_width = unsafe { SCREEN_INFO._dimensions.unwrap().0 };
+    let screen_height = unsafe { SCREEN_INFO._dimensions.unwrap().1 };
     // Truncate thumb position to filter white noise.
     let c: (f32, f32) = (
         (landmarks_coordinates[0].0 / 2f32.powi(TRUNCATURE_SIZE)) * 2f32.powi(TRUNCATURE_SIZE),
@@ -87,7 +108,8 @@ fn compute_wrist_pos(landmarks_coordinates: &Vec<(f32, f32, f32)>) -> (i32, i32)
     res
 }
 
-const FINGER_DISTANCE_RATIO: f32 = 2f32;
+const LEFT_CLIC_RATIO: f32 = 2f32;
+const RIGHT_CLIC_RATIO: f32 = 2f32;
 
 /**
  * Returns the hand gesture recognized with geometry.
@@ -112,9 +134,9 @@ fn compute_gesture(landmarks_coordinates: &Vec<(f32, f32, f32)>) -> gesture {
             + (landmarks_coordinates[8].2 - landmarks_coordinates[12].2).powi(2i32),
     );
 
-    if thumb_index_distance < (thumb_middle_distance / FINGER_DISTANCE_RATIO) {
+    if thumb_index_distance < (thumb_middle_distance / LEFT_CLIC_RATIO) {
         gesture::thumb_index_pinched
-    } else if thumb_middle_distance < (thumb_index_distance / FINGER_DISTANCE_RATIO) {
+    } else if thumb_middle_distance < (thumb_index_distance / RIGHT_CLIC_RATIO) {
         gesture::thumb_middle_pinched
     } else {
         gesture::none

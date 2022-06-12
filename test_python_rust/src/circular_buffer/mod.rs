@@ -6,6 +6,7 @@
 
 use math::round;
 
+// Size of the circular buffer.
 const DATA_MAX_SIZE: usize = 4;
 
 pub struct circular_buffer {
@@ -36,6 +37,10 @@ impl circular_buffer {
         self._index += 1;
     }
 
+    /**
+     * Applies a mean filter to the circular buffer values.
+     * Returns the tuple of coordinates calculated with the mean filter.
+     */
     #[inline(always)]
     pub fn mean_filter(&mut self) -> (i32, i32) {
         let mut sum: (i32, i32) = (0i32, 0i32);
@@ -51,6 +56,11 @@ impl circular_buffer {
         res
     }
 
+    /**
+     * Applies a median filter to the circular buffer values.
+     * Returns the tuple of coordinates calculated with the median filter.
+     */
+    #[inline(always)]
     pub fn median_filter(&mut self) -> (i32, i32) {
         let mut x: Vec<i32> = Vec::with_capacity(self._data.len());
         let mut y: Vec<i32> = Vec::with_capacity(self._data.len());
@@ -73,6 +83,9 @@ impl Default for circular_buffer {
     }
 }
 
+/**
+ * Finds and returns the median value in an array.
+ */
 fn array_median(v: &mut Vec<i32>) -> i32 {
     v.sort();
 
