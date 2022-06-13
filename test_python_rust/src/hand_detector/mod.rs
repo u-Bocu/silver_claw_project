@@ -10,6 +10,8 @@ use winapi::um::winuser;
 use pyo3::prelude::*;
 use pyo3::types::{PyAny, PyList};
 
+mod geometry;
+
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub enum gesture {
     open,
@@ -142,7 +144,59 @@ fn compute_gesture(landmarks_coordinates: &Vec<(f32, f32, f32)>) -> gesture {
         gesture::thumb_index_pinched
     } else if thumb_middle_distance < (thumb_index_distance / RIGHT_CLIC_RATIO) {
         gesture::thumb_middle_pinched
+    } else if compute_open_hand(landmarks_coordinates) {
+        gesture::open
     } else {
         gesture::none
     }
+}
+
+const ANGLE_LOW_MARGIN: f32 = 170f32;
+const ANGLE_HIGH_MARGIN: f32 = 190f32;
+
+fn compute_open_hand(landmarks_coordinates: &Vec<(f32, f32, f32)>) -> bool {
+    let mut r: bool = true;
+
+    let mut n: usize = 6;
+    loop {
+        loop {
+            let a: Vec<f32> = vec![
+                landmarks_coordinates[n - 1].0,
+                landmarks_coordinates[n - 1].1,
+                landmarks_coordinates[n - 1].2,
+            ];
+
+            let b: Vec<f32> = vec![
+                landmarks_coordinates[n].0,
+                landmarks_coordinates[n].1,
+                landmarks_coordinates[n].2,
+            ];
+
+            let c: Vec<f32> = vec![
+                landmarks_coordinates[n + 1].0,
+                landmarks_coordinates[n + 1].1,
+                landmarks_coordinates[n + 1].2,
+            ];
+
+            let v: Vec<f32> = geometry::compute_vec_from_points(&a, &b);
+            let w: Vec<f32> = geometry::compute_vec_from_points(&b, &c);
+
+            let angle: f32 = geometry::compute_angle(&v, &w);
+
+            if !(ANGLE_LOW_MARGIN < angle && angle < ANGLE_HIGH_MARGIN) {
+                r = false;
+            }
+
+            n += 1;
+            if n % 2 == 0 {
+                break;
+            }
+        }
+        n += 1;
+        if n > 19 {
+            break;
+        }
+    }
+
+    r
 }
