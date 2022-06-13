@@ -7,8 +7,13 @@ use pyo3::types::IntoPyDict;
 // Local module
 mod circular_buffer;
 mod hand_detector;
+mod taskbar;
 
 fn main() -> PyResult<()> {
+    // Create taskbar icon
+    let mut nid: winapi::um::shellapi::NOTIFYICONDATAW = taskbar::create();
+    //taskbar::delete(&mut nid);
+
     // Init
     pyo3::prepare_freethreaded_python();
     Python::with_gil(|py| {
@@ -42,7 +47,9 @@ fn main() -> PyResult<()> {
             println!("{:?}", hand._gesture);
             println!("{:?}", previous_hand._gesture);
 
-            if hand._gesture != hand_detector::gesture::void {
+            if hand._gesture != hand_detector::gesture::void
+                && hand._gesture != hand_detector::gesture::thumb_middle_pinched
+            {
                 e.mouse_move_to(hand_position.0, hand_position.1);
             }
 
@@ -53,11 +60,15 @@ fn main() -> PyResult<()> {
                     _ => (),
                 }
                 match hand._gesture {
-                    hand_detector::gesture::thumb_index_pinched => e.mouse_down(MouseButton::Left),
-                    hand_detector::gesture::thumb_middle_pinched => {
-                        e.mouse_down(MouseButton::Right)
+                    hand_detector::gesture::thumb_index_pinched => {
+                        e.mouse_down(MouseButton::Left);
+                        remanant_images = circular_buffer::circular_buffer::new(16usize);
                     }
-                    _ => (),
+                    hand_detector::gesture::thumb_middle_pinched => {
+                        e.mouse_down(MouseButton::Right);
+                        remanant_images = circular_buffer::circular_buffer::new(16usize);
+                    }
+                    _ => remanant_images = circular_buffer::circular_buffer::new(4usize),
                 }
             }
 

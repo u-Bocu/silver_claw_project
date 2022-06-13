@@ -51,7 +51,6 @@ pub fn get_hand_state(landmarks: &PyAny) -> PyResult<hand_state> {
  * Does exactly what you think it does.
  * Returns true is the gesture has changed between h0 and h1.
  */
-#[inline(always)]
 pub fn has_gesture_changed(h0: hand_state, h1: hand_state) -> bool {
     if h0._gesture == h1._gesture || h0._gesture == gesture::void || h1._gesture == gesture::void {
         false

@@ -15,14 +15,13 @@ pub struct circular_buffer {
 }
 
 impl circular_buffer {
-    fn new(s: usize) -> Self {
+    pub fn new(s: usize) -> Self {
         circular_buffer {
             _data: Vec::with_capacity(s),
             _index: 0usize,
         }
     }
 
-    #[inline(always)]
     pub fn append(&mut self, data: (i32, i32)) {
         if self._index >= self._data.capacity() {
             self._index = 0usize;
@@ -41,7 +40,6 @@ impl circular_buffer {
      * Applies a mean filter to the circular buffer values.
      * Returns the tuple of coordinates calculated with the mean filter.
      */
-    #[inline(always)]
     pub fn mean_filter(&mut self) -> (i32, i32) {
         let mut sum: (i32, i32) = (0i32, 0i32);
 
@@ -60,7 +58,6 @@ impl circular_buffer {
      * Applies a median filter to the circular buffer values.
      * Returns the tuple of coordinates calculated with the median filter.
      */
-    #[inline(always)]
     pub fn median_filter(&mut self) -> (i32, i32) {
         let mut x: Vec<i32> = Vec::with_capacity(self._data.len());
         let mut y: Vec<i32> = Vec::with_capacity(self._data.len());
