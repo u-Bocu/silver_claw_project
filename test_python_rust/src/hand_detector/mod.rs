@@ -61,8 +61,11 @@ pub fn has_gesture_changed(h0: hand_state, h1: hand_state) -> bool {
 }
 
 const TRUNCATURE_SIZE: i32 = 10i32;
-const X_SPEED_MULTIPLICATOR: f32 = 1f32;
-const Y_SPEED_MULTIPLICATOR: f32 = 1f32;
+const X_SPEED_MULTIPLICATOR: f32 = 10f32 / 5f32;
+const Y_SPEED_MULTIPLICATOR: f32 = 10f32 / 6.5f32;
+
+const X_OFFSET_MULTIPLICATOR: f32 = 0.25f32;
+const Y_OFFSET_MULTIPLICATOR: f32 = 0.35f32;
 
 /**
  * Screen dimensions singleton.
@@ -102,8 +105,10 @@ fn compute_wrist_pos(landmarks_coordinates: &Vec<(f32, f32, f32)>) -> (i32, i32)
     );
 
     let res: (i32, i32) = (
-        ((screen_width - c.0 * screen_width) / X_SPEED_MULTIPLICATOR) as i32,
-        (c.1 * screen_height / Y_SPEED_MULTIPLICATOR) as i32,
+        (((screen_width - c.0 * screen_width) * X_SPEED_MULTIPLICATOR)
+            - (screen_width * X_OFFSET_MULTIPLICATOR)) as i32,
+        ((c.1 * screen_height * Y_SPEED_MULTIPLICATOR) - (screen_height * Y_OFFSET_MULTIPLICATOR))
+            as i32,
     );
     res
 }
