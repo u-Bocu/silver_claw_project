@@ -12,7 +12,7 @@ mod taskbar;
 fn main() -> PyResult<()> {
     // Create taskbar icon
     let mut nid: winapi::um::shellapi::NOTIFYICONDATAW = taskbar::create();
-    //taskbar::delete(&mut nid);
+    taskbar::delete(&mut nid);
 
     // Init
     pyo3::prepare_freethreaded_python();

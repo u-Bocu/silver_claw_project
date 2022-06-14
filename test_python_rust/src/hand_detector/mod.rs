@@ -146,6 +146,8 @@ fn compute_gesture(landmarks_coordinates: &Vec<(f32, f32, f32)>) -> gesture {
         gesture::thumb_middle_pinched
     } else if compute_open_hand(landmarks_coordinates) {
         gesture::open
+    } else if compute_closed_hand(landmarks_coordinates) {
+        gesture::closed
     } else {
         gesture::none
     }
@@ -199,4 +201,51 @@ fn compute_open_hand(landmarks_coordinates: &Vec<(f32, f32, f32)>) -> bool {
     }
 
     r
+}
+
+fn compute_closed_hand(landmarks_coordinates: &Vec<(f32, f32, f32)>) -> bool {
+    let mut r: bool = true;
+
+    let thumb_magnetude: f32 = compute_thumb_magnetude(landmarks_coordinates);
+
+    // For each finger except thumb, if magnetude is lower than thumb magnetude, the hand is considered closed.
+    for i in (5usize..=17usize).step_by(2usize) {
+        let a: Vec<f32> = vec![
+            landmarks_coordinates[i].0,
+            landmarks_coordinates[i].1,
+            landmarks_coordinates[i].2,
+        ];
+
+        let b: Vec<f32> = vec![
+            landmarks_coordinates[i + 3].0,
+            landmarks_coordinates[i + 3].1,
+            landmarks_coordinates[i + 3].2,
+        ];
+
+        let v: Vec<f32> = geometry::compute_vec_from_points(&a, &b);
+        let m: f32 = geometry::magnitude(&v);
+
+        if m > thumb_magnetude {
+            r = false;
+        }
+    }
+
+    r
+}
+
+fn compute_thumb_magnetude(landmarks_coordinates: &Vec<(f32, f32, f32)>) -> f32 {
+    let a: Vec<f32> = vec![
+        landmarks_coordinates[2].0,
+        landmarks_coordinates[2].1,
+        landmarks_coordinates[2].2,
+    ];
+
+    let b: Vec<f32> = vec![
+        landmarks_coordinates[4].0,
+        landmarks_coordinates[4].1,
+        landmarks_coordinates[4].2,
+    ];
+
+    let v: Vec<f32> = geometry::compute_vec_from_points(&a, &b);
+    geometry::magnitude(&v)
 }
