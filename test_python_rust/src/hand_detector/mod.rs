@@ -184,7 +184,7 @@ fn compute_open_hand(landmarks_coordinates: &Vec<(f32, f32, f32)>) -> bool {
             let w: Vec<f32> = geometry::compute_vec_from_points(&b, &c);
 
             let angle: f32 = geometry::compute_angle(&v, &w);
-
+            println!("{}", angle);
             if !(ANGLE_LOW_MARGIN < angle && angle < ANGLE_HIGH_MARGIN) {
                 r = false;
             }
