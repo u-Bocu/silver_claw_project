@@ -35,8 +35,6 @@ pub fn get_hand_state(landmarks: &PyAny) -> PyResult<hand_state> {
         let landmarks_coordinates: Vec<(f32, f32, f32)> =
             landmarks.extract::<Vec<(f32, f32, f32)>>()?;
 
-        //println!("{}", landmarks);
-
         Ok(hand_state {
             _wrist_pos: compute_wrist_pos(&landmarks_coordinates),
             _gesture: compute_gesture(&landmarks_coordinates),

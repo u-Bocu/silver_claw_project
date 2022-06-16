@@ -35,44 +35,58 @@ fn main() -> PyResult<()> {
         let mut previous_hand =
             hand_detector::get_hand_state(py.eval(code, None, Some(&locals))?.extract()?)?;
 
+        let mut sleep: bool = true;
+
         // Main Loop
         loop {
             let hand =
                 hand_detector::get_hand_state(py.eval(code, None, Some(&locals))?.extract()?)?;
 
-            // Use a circular buffer to filter high frequencies with median filter
-            remanant_images.append(hand._wrist_pos);
-            let hand_position: (i32, i32) = remanant_images.median_filter();
-
             println!("{:?}", hand._gesture);
-            println!("{:?}", previous_hand._gesture);
 
-            if hand._gesture != hand_detector::gesture::void
-                && hand._gesture != hand_detector::gesture::thumb_middle_pinched
-            {
-                e.mouse_move_to(hand_position.0, hand_position.1);
-            }
-
-            if hand_detector::has_gesture_changed(hand, previous_hand) {
-                match previous_hand._gesture {
-                    hand_detector::gesture::thumb_index_pinched => e.mouse_up(MouseButton::Left),
-                    hand_detector::gesture::thumb_middle_pinched => e.mouse_up(MouseButton::Right),
-                    _ => (),
+            if sleep {
+                if hand._gesture == hand_detector::gesture::open {
+                    sleep = false;
                 }
-                match hand._gesture {
-                    hand_detector::gesture::thumb_index_pinched => {
-                        e.mouse_down(MouseButton::Left);
-                        remanant_images = circular_buffer::circular_buffer::new(16usize);
-                    }
-                    hand_detector::gesture::thumb_middle_pinched => {
-                        e.mouse_down(MouseButton::Right);
-                        remanant_images = circular_buffer::circular_buffer::new(16usize);
-                    }
-                    _ => remanant_images = circular_buffer::circular_buffer::new(4usize),
-                }
-            }
+            } else {
+                // Use a circular buffer to filter high frequencies with median filter
+                remanant_images.append(hand._wrist_pos);
+                let hand_position: (i32, i32) = remanant_images.median_filter();
 
-            previous_hand = hand;
+                //println!("{:?}", previous_hand._gesture);
+
+                if hand._gesture != hand_detector::gesture::void
+                    && hand._gesture != hand_detector::gesture::thumb_middle_pinched
+                {
+                    e.mouse_move_to(hand_position.0, hand_position.1);
+                }
+
+                if hand_detector::has_gesture_changed(hand, previous_hand) {
+                    match previous_hand._gesture {
+                        hand_detector::gesture::thumb_index_pinched => {
+                            e.mouse_up(MouseButton::Left)
+                        }
+                        hand_detector::gesture::thumb_middle_pinched => {
+                            e.mouse_up(MouseButton::Right)
+                        }
+                        _ => (),
+                    }
+                    match hand._gesture {
+                        hand_detector::gesture::thumb_index_pinched => {
+                            e.mouse_down(MouseButton::Left);
+                            remanant_images = circular_buffer::circular_buffer::new(16usize);
+                        }
+                        hand_detector::gesture::thumb_middle_pinched => {
+                            e.mouse_down(MouseButton::Right);
+                            remanant_images = circular_buffer::circular_buffer::new(16usize);
+                        }
+                        hand_detector::gesture::closed => sleep = true,
+                        _ => remanant_images = circular_buffer::circular_buffer::new(4usize),
+                    }
+                }
+
+                previous_hand = hand;
+            }
         }
     })
 }
