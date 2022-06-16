@@ -50,7 +50,13 @@ fn main() -> PyResult<()> {
                 }
             } else {
                 // Use a circular buffer to filter high frequencies with median filter
-                remanant_images.append(hand._wrist_pos);
+                match hand._wrist_pos {
+                    Some(pos) => {
+                        remanant_images.append(pos);
+                    }
+                    None => (),
+                }
+
                 let hand_position: (i32, i32) = remanant_images.median_filter();
 
                 //println!("{:?}", previous_hand._gesture);

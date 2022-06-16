@@ -24,7 +24,7 @@ pub enum gesture {
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub struct hand_state {
-    pub _wrist_pos: (i32, i32),
+    pub _wrist_pos: Option<(i32, i32)>,
     pub _gesture: gesture,
 }
 
@@ -36,12 +36,12 @@ pub fn get_hand_state(landmarks: &PyAny) -> PyResult<hand_state> {
             landmarks.extract::<Vec<(f32, f32, f32)>>()?;
 
         Ok(hand_state {
-            _wrist_pos: compute_wrist_pos(&landmarks_coordinates),
+            _wrist_pos: Some(compute_wrist_pos(&landmarks_coordinates)),
             _gesture: compute_gesture(&landmarks_coordinates),
         })
     } else {
         Ok(hand_state {
-            _wrist_pos: (0i32, 0i32),
+            _wrist_pos: None,
             _gesture: gesture::void,
         })
     }
