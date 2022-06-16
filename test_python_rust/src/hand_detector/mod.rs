@@ -153,8 +153,8 @@ fn compute_gesture(landmarks_coordinates: &Vec<(f32, f32, f32)>) -> gesture {
     }
 }
 
-const ANGLE_LOW_MARGIN: f32 = 170f32;
-const ANGLE_HIGH_MARGIN: f32 = 190f32;
+const ANGLE_LOW_MARGIN: f32 = -10f32;
+const ANGLE_HIGH_MARGIN: f32 = 10f32;
 
 fn compute_open_hand(landmarks_coordinates: &Vec<(f32, f32, f32)>) -> bool {
     let mut r: bool = true;
@@ -184,7 +184,6 @@ fn compute_open_hand(landmarks_coordinates: &Vec<(f32, f32, f32)>) -> bool {
             let w: Vec<f32> = geometry::compute_vec_from_points(&b, &c);
 
             let angle: f32 = geometry::compute_angle(&v, &w);
-            println!("{}", angle);
             if !(ANGLE_LOW_MARGIN < angle && angle < ANGLE_HIGH_MARGIN) {
                 r = false;
             }
@@ -194,7 +193,7 @@ fn compute_open_hand(landmarks_coordinates: &Vec<(f32, f32, f32)>) -> bool {
                 break;
             }
         }
-        n += 1;
+        n += 2;
         if n > 19 {
             break;
         }
