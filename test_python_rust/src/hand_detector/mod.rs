@@ -19,6 +19,7 @@ pub enum gesture {
     none,
     thumb_index_pinched,
     thumb_middle_pinched,
+    transition,
     void,
 }
 
@@ -112,8 +113,10 @@ fn compute_wrist_pos(landmarks_coordinates: &Vec<(f32, f32, f32)>) -> (i32, i32)
     res
 }
 
-const LEFT_CLIC_RATIO: f32 = 2f32;
+const LEFT_CLIC_RATIO: f32 = 2.25f32;
 const RIGHT_CLIC_RATIO: f32 = 2f32;
+const LEFT_CLIC_TRANSITION_RATIO: f32 = 2f32;
+const RIGHT_CLIC_TRANSITION_RATIO: f32 = 1.75f32;
 
 /**
  * Returns the hand gesture recognized with geometry.
@@ -142,6 +145,10 @@ fn compute_gesture(landmarks_coordinates: &Vec<(f32, f32, f32)>) -> gesture {
         gesture::thumb_index_pinched
     } else if thumb_middle_distance < (thumb_index_distance / RIGHT_CLIC_RATIO) {
         gesture::thumb_middle_pinched
+    } else if thumb_index_distance < (thumb_middle_distance / LEFT_CLIC_TRANSITION_RATIO)
+        || thumb_middle_distance < (thumb_index_distance / RIGHT_CLIC_TRANSITION_RATIO)
+    {
+        gesture::transition
     } else if compute_open_hand(landmarks_coordinates) {
         gesture::open
     } else if compute_closed_hand(landmarks_coordinates) {
