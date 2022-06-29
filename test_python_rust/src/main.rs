@@ -79,14 +79,14 @@ fn main() -> PyResult<()> {
                         match hand._gesture {
                             hand_detector::gesture::thumb_index_pinched => {
                                 e.mouse_down(MouseButton::Left);
-                                remanant_images = circular_buffer::circular_buffer::new(16usize);
+                                remanant_images.resize(16usize);
                             }
                             hand_detector::gesture::thumb_middle_pinched => {
                                 e.mouse_down(MouseButton::Right);
-                                remanant_images = circular_buffer::circular_buffer::new(16usize);
+                                remanant_images.resize(16usize);
                             }
                             hand_detector::gesture::closed => sleep = true,
-                            _ => remanant_images = circular_buffer::circular_buffer::new(4usize),
+                            _ => remanant_images.resize(4usize),
                         }
                     }
 

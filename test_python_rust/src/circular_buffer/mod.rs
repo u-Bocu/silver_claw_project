@@ -7,7 +7,10 @@
 use math::round;
 
 // Size of the circular buffer.
-const DATA_MAX_SIZE: usize = 4;
+const BUFFER_DEFAULT_SIZE: usize = 4;
+
+const BUFFER_MAX_SIZE: usize = 20;
+const BUFFER_MIN_SIZE: usize = 3;
 
 pub struct circular_buffer {
     _data: Vec<(i32, i32)>,
@@ -34,6 +37,27 @@ impl circular_buffer {
         }
 
         self._index += 1;
+    }
+
+    /**
+     * Modifies circular_buffer's data capacity to increase reactivity or filter accuracy.
+     * Lower buffer size means more reactivity, higher buffer size means more accuracy for small movements.
+     */
+    pub fn resize(&mut self, mut s: usize) {
+        if s > BUFFER_MAX_SIZE {
+            s = BUFFER_MAX_SIZE;
+        } else if s < BUFFER_MIN_SIZE {
+            s = BUFFER_MIN_SIZE;
+        }
+
+        if s > self._data.capacity() {
+            self._data.reserve_exact(s - self._data.len());
+        } else if s < self._data.capacity(){
+            // Vec.last() method returns Option<&T>, which is not what we want here.
+            let temp: (i32, i32) = self._data[self._data.len() - 1];
+            self._data = Vec::with_capacity(s);
+            self._data.push(temp);
+        }
     }
 
     /**
@@ -74,7 +98,7 @@ impl circular_buffer {
 impl Default for circular_buffer {
     fn default() -> Self {
         circular_buffer {
-            _data: Vec::with_capacity(DATA_MAX_SIZE),
+            _data: Vec::with_capacity(BUFFER_DEFAULT_SIZE),
             _index: 0usize,
         }
     }

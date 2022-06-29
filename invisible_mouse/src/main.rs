@@ -1,29 +1,19 @@
 use std::ffi::OsString;
-use std::time::Duration;
 use std::sync::mpsc;
+use std::time::Duration;
 
-use anyhow::{
-    Result,
-    Error,
-};
+use anyhow::{Error, Result};
 
 use enigo::*;
 
 use windows_service::{
     define_windows_service,
-    service_dispatcher,
     service::{
-        ServiceControl,
-        ServiceStatus,
-        ServiceControlAccept,
-        ServiceExitCode,
-        ServiceState, 
+        ServiceControl, ServiceControlAccept, ServiceExitCode, ServiceState, ServiceStatus,
         ServiceType,
     },
-    service_control_handler::{
-        self, 
-        ServiceControlHandlerResult
-    },
+    service_control_handler::{self, ServiceControlHandlerResult},
+    service_dispatcher,
 };
 
 define_windows_service!(ffi_service_main, service_main);
@@ -49,7 +39,7 @@ fn run_service(_arguments: Vec<OsString>) -> Result<(), Error> {
             ServiceControl::Stop => {
                 shutdown_tx.send(()).unwrap();
                 ServiceControlHandlerResult::NoError
-            },
+            }
             ServiceControl::Interrogate => ServiceControlHandlerResult::NoError,
             _ => ServiceControlHandlerResult::NotImplemented,
         }
@@ -84,9 +74,8 @@ fn run_service(_arguments: Vec<OsString>) -> Result<(), Error> {
     // Init
     let mut e = Enigo::new();
 
-    loop { // Infinite main loop
-
-        
+    loop {
+        // Infinite main loop
 
         match shutdown_rx.recv_timeout(Duration::from_micros(1)) {
             Ok(_) | Err(mpsc::RecvTimeoutError::Disconnected) => break,
