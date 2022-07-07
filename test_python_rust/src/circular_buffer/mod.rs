@@ -137,11 +137,18 @@ impl circular_buffer {
         let speeds: Option<Vec<(i32, i32)>> = self.get_speeds();
 
         match speeds {
-            Some(mut speeds) => {
-                //let median_from_speeds: i32 = array_median(&mut speeds);
+            Some(speeds) => {
+                let speeds_size: f64 = speeds.len() as f64;
 
-                if speeds.len() > 1 {
-                    Some(2)
+                if speeds_size > 1f64 {
+                    let acceleration: i32 =
+                        (speeds[round::floor(speeds_size / 2f64, 0i8) as usize].0
+                            - speeds.last().unwrap().0)
+                            .abs()
+                            + (speeds[round::floor(speeds_size / 2f64, 0i8) as usize].1
+                                - speeds.last().unwrap().1)
+                                .abs();
+                    Some(acceleration)
                 } else {
                     None
                 }
