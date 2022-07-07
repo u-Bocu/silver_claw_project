@@ -43,6 +43,7 @@ fn main() -> PyResult<()> {
                 hand_detector::get_hand_state(py.eval(code, None, Some(&locals))?.extract()?)?;
 
             println!("{:?}", hand._gesture);
+            remanant_images.print_acceleration();
 
             if sleep {
                 if hand._gesture == hand_detector::gesture::open {

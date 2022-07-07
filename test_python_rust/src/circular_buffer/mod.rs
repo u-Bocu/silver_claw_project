@@ -40,6 +40,26 @@ impl circular_buffer {
     }
 
     /**
+     * Condidering cursor acceleration, this functions resizes the buffer to get either precision of responsivity.
+     *
+     * No parameters.
+     * No return variable.
+     */
+    pub fn reevaluate_size(&self) {
+        let mut acceleration;
+
+        match self.get_accelerations() {
+            Some(a) => {
+                acceleration = a;
+
+                let last_acceleration: (i32, i32) = acceleration.pop().unwrap();
+                if (last_acceleration.0).abs() + (last_acceleration.1).abs() > 100 {}
+            }
+            None => {}
+        };
+    }
+
+    /**
      * Modifies circular_buffer's data capacity to increase reactivity or filter accuracy.
      * Lower buffer size means more reactivity, higher buffer size means more accuracy for small movements.
      */
@@ -52,11 +72,81 @@ impl circular_buffer {
 
         if s > self._data.capacity() {
             self._data.reserve_exact(s - self._data.len());
-        } else if s < self._data.capacity(){
+        } else if s < self._data.capacity() {
             // Vec.last() method returns Option<&T>, which is not what we want here.
             let temp: (i32, i32) = self._data[self._data.len() - 1];
             self._data = Vec::with_capacity(s);
             self._data.push(temp);
+        }
+    }
+
+    /**
+     * No parameter.
+     * Returns a vector containing last cursor speed (up to buffer size - 1).
+     */
+    fn get_speeds(&self) -> Option<Vec<(i32, i32)>> {
+        let mut speeds: Vec<(i32, i32)> = self._data.clone();
+
+        if speeds.len() > 1 {
+            for i in 0..(speeds.len() - 1usize) {
+                let tmp: (i32, i32) = (
+                    (speeds[i].0 - speeds[i + 1].0).abs(),
+                    (speeds[i].1 - speeds[i + 1].1).abs(),
+                );
+
+                speeds[i] = tmp;
+            }
+            speeds.pop();
+
+            Some(speeds)
+        } else {
+            None
+        }
+    }
+
+    /**
+     * No parameter.
+     * Returns a vector containing last cursor accelerations (up to buffer size - 2).
+     */
+    fn get_accelerations(&self) -> Option<Vec<(i32, i32)>> {
+        let accelerations: Option<Vec<(i32, i32)>> = self.get_speeds();
+
+        match accelerations {
+            Some(mut accelerations) => {
+                if accelerations.len() > 1 {
+                    for i in 0..(accelerations.len() - 1usize) {
+                        let tmp: (i32, i32) = (
+                            (accelerations[i].0 - accelerations[i + 1].0).abs(),
+                            (accelerations[i].1 - accelerations[i + 1].1).abs(),
+                        );
+
+                        accelerations[i] = tmp;
+                    }
+                    accelerations.pop();
+
+                    Some(accelerations)
+                } else {
+                    None
+                }
+            }
+            None => None,
+        }
+    }
+
+    fn get_acceleration(&self) -> Option<i32> {
+        let speeds: Option<Vec<(i32, i32)>> = self.get_speeds();
+
+        match speeds {
+            Some(mut speeds) => {
+                //let median_from_speeds: i32 = array_median(&mut speeds);
+
+                if speeds.len() > 1 {
+                    Some(2)
+                } else {
+                    None
+                }
+            }
+            None => None,
         }
     }
 
@@ -92,6 +182,24 @@ impl circular_buffer {
         }
 
         (array_median(&mut x), array_median(&mut y))
+    }
+
+    /**
+     * Print current acceleration.
+     * Use for debug purpose.
+     */
+
+    pub fn print_acceleration(&self) {
+        let acceleration: Option<Vec<(i32, i32)>> = self.get_accelerations();
+
+        match acceleration {
+            Some(a) => {
+                let absolute_acceleration: i32 =
+                    a.last().unwrap().0.abs() + a.last().unwrap().1.abs();
+                println!("{:?}", absolute_acceleration)
+            }
+            None => {}
+        }
     }
 }
 
