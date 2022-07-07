@@ -197,13 +197,11 @@ impl circular_buffer {
      */
 
     pub fn print_acceleration(&self) {
-        let acceleration: Option<Vec<(i32, i32)>> = self.get_accelerations();
+        let acceleration: Option<i32> = self.get_acceleration();
 
         match acceleration {
             Some(a) => {
-                let absolute_acceleration: i32 =
-                    a.last().unwrap().0.abs() + a.last().unwrap().1.abs();
-                println!("{:?}", absolute_acceleration)
+                println!("{:?}", a)
             }
             None => {}
         }
