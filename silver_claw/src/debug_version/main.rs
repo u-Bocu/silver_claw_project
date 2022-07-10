@@ -5,9 +5,7 @@ use pyo3::py_run;
 use pyo3::types::IntoPyDict;
 
 // Local module
-mod circular_buffer;
-mod hand_detector;
-mod taskbar;
+use silver_claw_lib::*;
 
 fn main() -> PyResult<()> {
     // Create taskbar icon
@@ -43,7 +41,6 @@ fn main() -> PyResult<()> {
                 hand_detector::get_hand_state(py.eval(code, None, Some(&locals))?.extract()?)?;
 
             println!("{:?}", hand._gesture);
-            remanant_images.print_acceleration();
 
             if sleep {
                 if hand._gesture == hand_detector::gesture::open {
@@ -57,6 +54,9 @@ fn main() -> PyResult<()> {
                     }
                     None => (),
                 }
+
+                remanant_images.print_acceleration();
+                remanant_images.reevaluate_size();
 
                 let hand_position: (i32, i32) = remanant_images.median_filter();
 
@@ -80,14 +80,14 @@ fn main() -> PyResult<()> {
                         match hand._gesture {
                             hand_detector::gesture::thumb_index_pinched => {
                                 e.mouse_down(MouseButton::Left);
-                                remanant_images.resize(16usize);
+                                remanant_images.resize(20usize);
                             }
                             hand_detector::gesture::thumb_middle_pinched => {
                                 e.mouse_down(MouseButton::Right);
-                                remanant_images.resize(16usize);
+                                remanant_images.resize(20usize);
                             }
                             hand_detector::gesture::closed => sleep = true,
-                            _ => remanant_images.resize(4usize),
+                            _ => remanant_images.resize(3usize),
                         }
                     }
 

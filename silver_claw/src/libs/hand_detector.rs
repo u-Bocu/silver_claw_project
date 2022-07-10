@@ -98,18 +98,32 @@ fn compute_wrist_pos(landmarks_coordinates: &Vec<(f32, f32, f32)>) -> (i32, i32)
 
     let screen_width = unsafe { SCREEN_INFO._dimensions.unwrap().0 };
     let screen_height = unsafe { SCREEN_INFO._dimensions.unwrap().1 };
+
     // Truncate thumb position to filter white noise.
     let c: (f32, f32) = (
         (landmarks_coordinates[0].0 / 2f32.powi(TRUNCATURE_SIZE)) * 2f32.powi(TRUNCATURE_SIZE),
         (landmarks_coordinates[0].1 / 2f32.powi(TRUNCATURE_SIZE)) * 2f32.powi(TRUNCATURE_SIZE),
     );
 
-    let res: (i32, i32) = (
+    let mut res: (i32, i32) = (
         (((screen_width - c.0 * screen_width) * X_SPEED_MULTIPLICATOR)
             - (screen_width * X_OFFSET_MULTIPLICATOR)) as i32,
         ((c.1 * screen_height * Y_SPEED_MULTIPLICATOR) - (screen_height * Y_OFFSET_MULTIPLICATOR))
             as i32,
     );
+
+    if res.0 < 0i32 {
+        res.0 = 0i32;
+    } else if res.0 > screen_width as i32 {
+        res.0 = screen_width as i32;
+    }
+
+    if res.1 < 0i32 {
+        res.1 = 0i32;
+    } else if res.1 > screen_height as i32 {
+        res.1 = screen_height as i32;
+    }
+
     res
 }
 

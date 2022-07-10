@@ -20,7 +20,7 @@ define_windows_service!(ffi_service_main, service_main);
 
 fn main() -> Result<(), windows_service::Error> {
     // The service must be installed, otherwise it will not work
-    service_dispatcher::start("invisible_mouse", ffi_service_main)?;
+    service_dispatcher::start("silver_claw", ffi_service_main)?;
     Ok(())
 }
 
@@ -46,7 +46,7 @@ fn run_service(_arguments: Vec<OsString>) -> Result<(), Error> {
     };
 
     // Register system service event handler.
-    let status_handle = service_control_handler::register("invisible_mouse", event_handler)?;
+    let status_handle = service_control_handler::register("silver_claw", event_handler)?;
 
     let next_status = ServiceStatus {
         // Should match the one from system service registry
@@ -72,7 +72,7 @@ fn run_service(_arguments: Vec<OsString>) -> Result<(), Error> {
     status_handle.set_service_status(next_status)?;
 
     // Init
-    let mut e = Enigo::new();
+    let mut _e = Enigo::new();
 
     loop {
         // Infinite main loop

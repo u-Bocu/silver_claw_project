@@ -62,6 +62,8 @@ impl circular_buffer {
     /**
      * Modifies circular_buffer's data capacity to increase reactivity or filter accuracy.
      * Lower buffer size means more reactivity, higher buffer size means more accuracy for small movements.
+     *
+     * Parameter: the desired new buffer size
      */
     pub fn resize(&mut self, mut s: usize) {
         if s > BUFFER_MAX_SIZE {
@@ -133,6 +135,9 @@ impl circular_buffer {
         }
     }
 
+    /**
+     * Returns the acceleration considering the median speed stored in the buffer and the last speed calculated.
+     */
     fn get_acceleration(&self) -> Option<i32> {
         let speeds: Option<Vec<(i32, i32)>> = self.get_speeds();
 
@@ -195,7 +200,6 @@ impl circular_buffer {
      * Print current acceleration.
      * Use for debug purpose.
      */
-
     pub fn print_acceleration(&self) {
         let acceleration: Option<i32> = self.get_acceleration();
 

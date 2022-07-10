@@ -32,11 +32,17 @@ LIBS = $(patsubst %, $(LDIR)$(PSEP)%,$(_LIBS))
 build:
 	cargo build
 
+build_debug:
+	cargo build --bin silver_claw_debug_version
+
 build_rls:
 	cargo build --release
 
 # Copy Python File
-copy_debug: build
+copy: build
+	$(CPF) $(LIBS) target$(PSEP)debug$(PSEP)$(_LIBS)
+
+copy_debug: build_debug
 	$(CPF) $(LIBS) target$(PSEP)debug$(PSEP)$(_LIBS)
 
 copy_rls: build_rls
@@ -44,7 +50,10 @@ copy_rls: build_rls
 
 # Run
 run_debug: copy_debug
-	cargo run
+	cargo run --bin silver_claw_debug_version
+
+run_installer: copy
+	cargo run --bin silver_claw_installer
 
 run_rls: copy_rls
-	cargo run --release
+	cargo run --bin silver_claw_installer --release 
