@@ -17,7 +17,7 @@ path = "src/debug_version/main.rs"
 
 [lib]
 name = "silver_claw_lib"
-path = "src/libs/libs.rs"
+path = "src/_libs/libs.rs"
 
 [dependencies]
 windows-service = "0.4.0"
