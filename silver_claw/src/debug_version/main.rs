@@ -58,7 +58,7 @@ fn main() -> PyResult<()> {
                 remanant_images.print_acceleration();
                 remanant_images.reevaluate_size();
 
-                let hand_position: (i32, i32) = remanant_images.median_filter();
+                let hand_position: (i32, i32) = remanant_images.mean_filter();
 
                 if hand._gesture != hand_detector::gesture::void
                     && hand._gesture != hand_detector::gesture::thumb_middle_pinched

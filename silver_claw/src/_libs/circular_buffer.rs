@@ -185,9 +185,11 @@ impl circular_buffer {
         }
 
         let size: i32 = self._data.len() as i32;
-        let res: (i32, i32) = (sum.0 / size, sum.1 / size);
-
-        res
+        if size == 0 {
+            (0i32, 0i32)
+        } else {
+            (sum.0 / size, sum.1 / size)
+        }
     }
 
     /**
@@ -237,7 +239,9 @@ impl Default for circular_buffer {
 fn array_median(v: &mut Vec<i32>) -> i32 {
     v.sort();
 
-    if v.len() % 2 == 0 {
+    if v.len() == 0 {
+        0i32
+    } else if v.len() % 2 == 0 {
         (v[((v.len() / 2) - 1) as usize] + v[(v.len() / 2) as usize]) / 2
     } else {
         v[round::floor((v.len() / 2) as f64, 0i8) as usize]
