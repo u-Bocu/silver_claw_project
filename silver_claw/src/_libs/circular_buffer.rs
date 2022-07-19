@@ -7,10 +7,14 @@
 use math::round;
 
 // Size of the circular buffer.
-const BUFFER_DEFAULT_SIZE: usize = 4;
+const BUFFER_DEFAULT_SIZE: usize = 4usize;
 
-const BUFFER_MAX_SIZE: usize = 20;
-const BUFFER_MIN_SIZE: usize = 3;
+const BUFFER_MAX_SIZE: usize = 20usize;
+const BUFFER_MIN_SIZE: usize = 3usize;
+
+const ACCELERATION_HI_HARDCAP: i32 = 100i32;
+const ACCELERATION_HI_SOFTCAP: i32 = 20i32;
+const ACCELERATION_LO_SOFTCAP: i32 = 10i32;
 
 pub struct circular_buffer {
     _data: Vec<(i32, i32)>,
@@ -25,18 +29,8 @@ impl circular_buffer {
         }
     }
 
-    pub fn append(&mut self, data: (i32, i32)) {
-        if self._index >= self._data.capacity() {
-            self._index = 0usize;
-        }
-
-        if self._data.len() <= self._index {
-            self._data.push(data);
-        } else {
-            self._data[self._index] = data;
-        }
-
-        self._index += 1;
+    pub fn insert(&mut self, data: (i32, i32)) {
+        self._data.insert(0, data)
     }
 
     /**
@@ -45,7 +39,7 @@ impl circular_buffer {
      * No parameters.
      * No return variable.
      */
-    pub fn reevaluate_size(&self) {
+    pub fn reevaluate_size(&mut self) {
         let mut acceleration;
 
         match self.get_accelerations() {
@@ -53,7 +47,26 @@ impl circular_buffer {
                 acceleration = a;
 
                 let last_acceleration: (i32, i32) = acceleration.pop().unwrap();
-                if (last_acceleration.0).abs() + (last_acceleration.1).abs() > 100 {}
+                let last_acceleration_flat: i32 =
+                    (last_acceleration.0).abs() + (last_acceleration.1).abs();
+
+                if last_acceleration_flat > ACCELERATION_HI_HARDCAP {
+                    self.resize(BUFFER_MIN_SIZE)
+                } else if last_acceleration_flat > ACCELERATION_HI_SOFTCAP {
+                    let mut new_acceleration: usize = self._data.capacity() - 3;
+                    if new_acceleration < BUFFER_MIN_SIZE {
+                        new_acceleration = BUFFER_MIN_SIZE;
+                    }
+
+                    self.resize(new_acceleration)
+                } else if last_acceleration_flat < ACCELERATION_LO_SOFTCAP {
+                    let mut new_acceleration: usize = self._data.capacity() + 1;
+                    if new_acceleration > BUFFER_MAX_SIZE {
+                        new_acceleration = BUFFER_MAX_SIZE;
+                    }
+
+                    self.resize(new_acceleration)
+                }
             }
             None => {}
         };
@@ -75,10 +88,7 @@ impl circular_buffer {
         if s > self._data.capacity() {
             self._data.reserve_exact(s - self._data.len());
         } else if s < self._data.capacity() {
-            // Vec.last() method returns Option<&T>, which is not what we want here.
-            let temp: (i32, i32) = self._data[self._data.len() - 1];
             self._data = Vec::with_capacity(s);
-            self._data.push(temp);
         }
     }
 
