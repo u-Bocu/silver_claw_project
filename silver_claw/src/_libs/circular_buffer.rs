@@ -12,8 +12,8 @@ const BUFFER_DEFAULT_SIZE: usize = 4usize;
 const BUFFER_MAX_SIZE: usize = 20usize;
 const BUFFER_MIN_SIZE: usize = 3usize;
 
-const ACCELERATION_HI_HARDCAP: i32 = 100i32;
-const ACCELERATION_HI_SOFTCAP: i32 = 20i32;
+const ACCELERATION_HI_HARDCAP: i32 = 300i32;
+const ACCELERATION_HI_SOFTCAP: i32 = 30i32;
 const ACCELERATION_LO_SOFTCAP: i32 = 10i32;
 
 pub struct circular_buffer {
@@ -101,6 +101,7 @@ impl circular_buffer {
             /*
              * We need to purge obsolete values in a smart way.
              * We use Vec::drain for that.
+             * Hard part is calculating range indexes for drain.
              */
 
             let index: usize = match self._index >= self._data.len() {
@@ -122,14 +123,12 @@ impl circular_buffer {
 
             let i: usize = i as usize;
 
-            assert!(i < self._data.len());
-            assert!(index < self._data.len());
-
             if i < index {
                 self._data = self._data.drain(i..=index).collect();
             } else if i > index {
                 self._data.drain(index + 1..i);
             } else {
+                // i == index
                 let tmp: (i32, i32) = self._data.remove(i);
                 self._data.clear();
                 self._data.push(tmp);
