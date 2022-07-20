@@ -50,7 +50,7 @@ fn main() -> PyResult<()> {
                 // Use a circular buffer to filter high frequencies with median filter
                 match hand._wrist_pos {
                     Some(pos) => {
-                        remanant_images.insert(pos);
+                        remanant_images.append(pos);
                     }
                     None => (),
                 }

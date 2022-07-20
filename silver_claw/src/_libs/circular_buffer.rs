@@ -29,12 +29,22 @@ impl circular_buffer {
         }
     }
 
-    pub fn insert(&mut self, data: (i32, i32)) {
-        self._data.insert(0, data)
+    pub fn append(&mut self, data: (i32, i32)) {
+        if self._index >= self._data.capacity() {
+            self._index = 0usize;
+        }
+
+        if self._data.len() <= self._index {
+            self._data.push(data);
+        } else {
+            self._data[self._index] = data;
+        }
+
+        self._index += 1;
     }
 
     /**
-     * Condidering cursor acceleration, this functions resizes the buffer to get either precision of responsivity.
+     * Condidering cursor acceleration, this functions resizes the buffer to get either precision or responsivity.
      *
      * No parameters.
      * No return variable.
