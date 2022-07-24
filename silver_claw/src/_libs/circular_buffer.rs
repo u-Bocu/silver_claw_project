@@ -60,15 +60,19 @@ impl circular_buffer {
                 let last_acceleration_flat: i32 =
                     (last_acceleration.0).abs() + (last_acceleration.1).abs();
 
-                if last_acceleration_flat > ACCELERATION_HI_HARDCAP {
-                    self.resize(BUFFER_MIN_SIZE)
-                } else if last_acceleration_flat > ACCELERATION_HI_SOFTCAP {
-                    let mut new_acceleration: usize = self._data.capacity() - 3;
-                    if new_acceleration < BUFFER_MIN_SIZE {
-                        new_acceleration = BUFFER_MIN_SIZE;
+                if last_acceleration_flat > ACCELERATION_HI_SOFTCAP {
+                    let buffer_shrinking: usize = last_acceleration_flat as usize / 10usize;
+                    let mut new_buffer_size: usize = match buffer_shrinking > self._data.capacity()
+                    {
+                        true => BUFFER_MIN_SIZE,
+                        false => self._data.capacity() - buffer_shrinking,
+                    };
+
+                    if new_buffer_size < BUFFER_MIN_SIZE {
+                        new_buffer_size = BUFFER_MIN_SIZE;
                     }
 
-                    self.resize(new_acceleration)
+                    self.resize(new_buffer_size)
                 } else if last_acceleration_flat < ACCELERATION_LO_SOFTCAP {
                     let mut new_acceleration: usize = self._data.capacity() + 1;
                     if new_acceleration > BUFFER_MAX_SIZE {

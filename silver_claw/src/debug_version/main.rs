@@ -1,5 +1,7 @@
 use enigo::*;
 
+use std::io;
+
 use pyo3::prelude::*;
 use pyo3::py_run;
 use pyo3::types::IntoPyDict;
@@ -11,6 +13,20 @@ fn main() -> PyResult<()> {
     // Create taskbar icon
     let mut nid: winapi::um::shellapi::NOTIFYICONDATAW = taskbar::create();
     taskbar::delete(&mut nid);
+
+    // Ask for calibration mode.
+    println!("Do you want to calibrate the system ? o/n");
+    let mut input: String = String::new();
+
+    io::stdin()
+        .read_line(&mut input)
+        .expect("Failed to read line");
+
+    let mut calibration: bool = false;
+
+    if input.eq(&String::from('o')) {
+        calibration = true;
+    }
 
     // Init
     pyo3::prepare_freethreaded_python();
@@ -34,6 +50,8 @@ fn main() -> PyResult<()> {
             hand_detector::get_hand_state(py.eval(code, None, Some(&locals))?.extract()?)?;
 
         let mut sleep: bool = true;
+
+        if calibration {}
 
         // Main Loop
         loop {
