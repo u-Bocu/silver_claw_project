@@ -5,6 +5,7 @@ use std::io;
 use pyo3::prelude::*;
 use pyo3::py_run;
 use pyo3::types::IntoPyDict;
+use pyo3::types::PyDict;
 
 // Local module
 use silver_claw_lib::*;
@@ -114,4 +115,29 @@ fn main() -> PyResult<()> {
             }
         }
     })
+}
+
+fn calibrate(py: Python, locals: &PyDict, code: &str) -> PyResult<()> {
+    let mut previous_hand =
+        hand_detector::get_hand_state(py.eval(code, None, Some(&locals))?.extract()?)?;
+
+    let mut sleep: bool = true;
+
+    loop {
+        let hand = hand_detector::get_hand_state(py.eval(code, None, Some(&locals))?.extract()?)?;
+
+        if sleep {
+            if hand._gesture == hand_detector::gesture::open {
+                sleep = false;
+            }
+        } else {
+            match hand._gesture {
+                hand_detector::gesture::void => {}
+                hand_detector::gesture::closed => sleep = true,
+                _ => {}
+            }
+
+            previous_hand = hand;
+        }
+    }
 }
