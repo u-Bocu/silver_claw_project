@@ -5,13 +5,11 @@ needed python modules:
 ***
 # <center>Silver Claw - Software Requirement and Design</center>
 
-<span style="color:grey">
 Version 1.00 
 
 ***
-### About this document:</span>
+### About this document:
 ***
-<span style="color:grey">
 This document is based on [MIL STD 498] SRS and SDD documents which describe separatly requirements and design of modules.
 <br>
 The SRD document gathers requirements and design description of module. Not all sections of MIL STD 498 exist in this document because the level of detail required is not as important.
@@ -28,29 +26,29 @@ In details: <br>
 - Section 5 shall describe coding.
 <br>
 <br>
-The level of detail is provided out of common sense. The more a description is detailled, the more the document will be subject to modifications.
+The level of detail is provided out of common sense. The more a description is detailled, the more the document will be subject to modifications.<br>
 </span>
 
 - [<center>Silver Claw - Software Requirement and Design</center>](#centersilver-claw---software-requirement-and-designcenter)
-    - [About this document:</span>](#about-this-documentspan)
-- [Scope <a name="scope"></a>](#scope-)
-  - [Identification <a name="identification"></a>](#identification-)
-  - [System overview <a name="system_overview"></a>](#system-overview-)
-  - [Reference documents <a name="reference documents"></a>](#reference-documents-)
-- [Module wide design decisions <a name="module_wide_design"></a>](#module-wide-design-decisions-)
-- [Functional requirements <a name="functional_requirements"></a>](#functional-requirements-)
-  - [Required states and modes <a name="required_states"></a>](#required-states-and-modes-)
-    - [Mouse mode <a name="mouse_mode"></a>](#mouse-mode-)
+    - [About this document:](#about-this-document)
+- [Scope](#scope)
+  - [Identification](#identification)
+  - [System overview](#system-overview)
+  - [Reference documents](#reference-documents)
+- [Module wide design decisions](#module-wide-design-decisions)
+- [Functional requirements](#functional-requirements)
+  - [Required states and modes](#required-states-and-modes)
+    - [Mouse mode](#mouse-mode)
     - [Sleep mode](#sleep-mode)
 - [Module capability requirements](#module-capability-requirements)
 
 ***
-# Scope <a name="scope"></a>
-## Identification <a name="identification"></a>
-## System overview <a name="system_overview"></a>
-## Reference documents <a name="reference documents"></a>
+# Scope
+## Identification
+## System overview
+## Reference documents
 
-# Module wide design decisions <a name="module_wide_design"></a>
+# Module wide design decisions 
 - 15/06/2022 - Global architecture (M.REMOND)<br>
     Silver Claw must be a service using the main camera to control the mouse on the main screen. This service is composed of two architectures:
     - A Python script using a Machine Learning module to detect the hand. (May be replaced by a C++ in the future.)
@@ -58,16 +56,13 @@ The level of detail is provided out of common sense. The more a description is d
 
     An installer should be available at some point.
 
-# Functional requirements <a name="functional_requirements"></a>
-## Required states and modes <a name="required_states"></a>
+# Functional requirements
+## Required states and modes
 ***
-<span style="color:darkblue">
 - Silver Claw is a service which shall provide a way for the user to control its mouse with a camera. (SRD_SCLAW_001)<br>
 - Silver Claw should provide a way to switch between modes with hand control. (SRD_SCLAW_002)<br>
-</span>
 
-### Mouse mode <a name="mouse_mode"></a>
-<span style="color:darkblue">
+### Mouse mode
 This operating mode shall drive the mouse according to the user's hand movements and gestures.<br>
 
 - This mode shall allow the user to left click. (SRD_SCLAW_101)<br>
@@ -75,14 +70,11 @@ This operating mode shall drive the mouse according to the user's hand movements
 - This mode shall allow the user to scroll. (SRD_SCLAW_103) <br>
 - This mode shall allow the user to move the mouse. (SRD_SCLAW_104)<br>
 - This mode shall allow the user to switch to sleep. (SRD_SCLAW_105)<br>
-</span>
 
 ### Sleep mode
-<span style="color:darkblue">
 This operating mode shall not control the mouse. It should only be possible to wake up the service. <br>
 
 - This mode should take the least resources possible. (SRD_SCLAW_201)<br>
 - This mode shall allow the user to wake up the program with an open hand gesture. (SRD_SCLAW_202)<br>
-</span>
 
 # Module capability requirements 
