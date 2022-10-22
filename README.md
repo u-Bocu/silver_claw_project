@@ -10,12 +10,10 @@ Version 1.00
 ***
 ### About this document:
 ***
+<div style="text-align: justify">
 This document is based on [MIL STD 498] SRS and SDD documents which describe separatly requirements and design of modules.
-<br>
 The SRD document gathers requirements and design description of module. Not all sections of MIL STD 498 exist in this document because the level of detail required is not as important.
-<br>
 Sections 2 and 3 shall define functionning requirements and wide design decisions (SRS). Sections 4 and 5 describe architecture and details of software (SDD).
-<br>
 The SRD document shall centralize all informations about the modules which condition the software's design and ensure that it covers all identified requirements.
 <br>
 <br>
@@ -26,8 +24,8 @@ In details: <br>
 - Section 5 shall describe coding.
 <br>
 <br>
-The level of detail is provided out of common sense. The more a description is detailled, the more the document will be subject to modifications.<br>
-</span>
+The level of detail is provided out of common sense. The more a description is detailled, the more the document will be subject to modifications.
+<br>
 
 - [<center>Silver Claw - Software Requirement and Design</center>](#centersilver-claw---software-requirement-and-designcenter)
     - [About this document:](#about-this-document)
