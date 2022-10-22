@@ -5,7 +5,11 @@ needed python modules:
 ***
 # <center>Silver Claw - Software Requirement and Design</center>
 
-### <span style="color:grey">About this document:</span>
+<span style="color:grey">
+Version 1.00 
+
+***
+### About this document:</span>
 ***
 <span style="color:grey">
 This document is based on [MIL STD 498] SRS and SDD documents which describe separatly requirements and design of modules.
@@ -28,7 +32,7 @@ The level of detail is provided out of common sense. The more a description is d
 </span>
 
 - [<center>Silver Claw - Software Requirement and Design</center>](#centersilver-claw---software-requirement-and-designcenter)
-    - [<span style="color:grey">About this document:</span>](#about-this-document)
+    - [About this document:</span>](#about-this-documentspan)
 - [Scope <a name="scope"></a>](#scope-)
   - [Identification <a name="identification"></a>](#identification-)
   - [System overview <a name="system_overview"></a>](#system-overview-)
@@ -38,7 +42,7 @@ The level of detail is provided out of common sense. The more a description is d
   - [Required states and modes <a name="required_states"></a>](#required-states-and-modes-)
     - [Mouse mode <a name="mouse_mode"></a>](#mouse-mode-)
     - [Sleep mode](#sleep-mode)
-  - [Module capability requirements](#module-capability-requirements)
+- [Module capability requirements](#module-capability-requirements)
 
 ***
 # Scope <a name="scope"></a>
@@ -81,4 +85,4 @@ This operating mode shall not control the mouse. It should only be possible to w
 - This mode shall allow the user to wake up the program with an open hand gesture. (SRD_SCLAW_202)<br>
 </span>
 
-## Module capability requirements 
+# Module capability requirements 
