@@ -27,8 +27,13 @@ In details: <br>
 The level of detail is provided out of common sense. The more a description is detailled, the more the document will be subject to modifications.
 <br>
 
+***
+## Table of Content
+<br>
+
 - [<center>Silver Claw - Software Requirement and Design</center>](#centersilver-claw---software-requirement-and-designcenter)
     - [About this document:](#about-this-document)
+  - [Table of Content](#table-of-content)
 - [Scope](#scope)
   - [Identification](#identification)
   - [System overview](#system-overview)
