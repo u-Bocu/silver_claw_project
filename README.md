@@ -1,3 +1,4 @@
+## A service using the main camera to control the mouse on the main screen.
 /!\ Windows only... for now
 
 needed python modules: (if you want to build the project yourself)
@@ -7,7 +8,7 @@ needed python modules: (if you want to build the project yourself)
 ***
 # Silver Claw - Software Requirement and Design
 
-Version 1.00 
+Version 1.00
 
 ***
 ### About this document:
@@ -46,6 +47,7 @@ The level of detail is provided out of common sense. The more a description is d
   - [Required states and modes](#required-states-and-modes)
     - [Mouse mode](#mouse-mode)
     - [Sleep mode](#sleep-mode)
+    - [Calibration mode](#calibration-mode)
 - [Module capability requirements](#module-capability-requirements)
 
 ***
@@ -57,7 +59,7 @@ The level of detail is provided out of common sense. The more a description is d
 # Module wide design decisions 
 - 15/06/2022 - Global architecture (M.REMOND)<br>
     Silver Claw must be a service using the main camera to control the mouse on the main screen. This service is composed of two architectures:
-    - A Python script using a Machine Learning module to detect the hand. (May be replaced by a C++ in the future.)
+    - A Python script using a Machine Learning module to detect the hand. (May be replaced by a C++ DLL in the future.)
     - A Rust main program controlling the mouse accordingly.
 
     An installer should be available at some point.
@@ -82,5 +84,12 @@ This operating mode shall not control the mouse. It should only be possible to w
 
 - This mode should take the least resources possible. (SRD_SCLAW_201)<br>
 - This mode shall allow the user to wake up the program with an open hand gesture. (SRD_SCLAW_202)<br>
+
+### Calibration mode
+This operating mode shall allow the user to drive the mouse to all edge cases in order to determine the lattitude offered by the camera.
+
+- This mode shall only allow the user to move the mouse. (SRD_SCLAW_301)<br>
+- This mode shall provide an interface allowing the user to know if their hand is detected or not. (SRD_SCLAW_302)<br>
+- This mode shall compute a coefficient used later to ensure each position on the screen is available in mouse mode. (SRD_SCLAW_303)<br>
 
 # Module capability requirements 
