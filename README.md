@@ -1,9 +1,11 @@
-needed python modules: 
+/!\ Windows only... for now
+
+needed python modules: (if you want to build the project yourself)
 - cv2 (open cv)
 - mediapipe (for hand recognition)
 
 ***
-# <center>Silver Claw - Software Requirement and Design</center>
+# Silver Claw - Software Requirement and Design
 
 Version 1.00 
 
@@ -17,7 +19,8 @@ Sections 2 and 3 shall define functionning requirements and wide design decision
 The SRD document shall centralize all informations about the modules which condition the software's design and ensure that it covers all identified requirements.
 <br>
 <br>
-In details: <br>
+In details:
+
 - Section 2 shall contain all decisions which impact design and purpose of a module.
 - Section 3 shar contain functional requirements of the module. Note that these requirements can be summarized in a set of functional scenarios provided by the module. To ensure traceability of these requirements, it is recommended to tag and reference them in a design section.
 - Section 4 shall describe the architecture proposed to code the functional requirements listed in Section 3. Each component defined here shall reference the requirements' tags.
@@ -31,7 +34,7 @@ The level of detail is provided out of common sense. The more a description is d
 ## Table of Content
 <br>
 
-- [<center>Silver Claw - Software Requirement and Design</center>](#centersilver-claw---software-requirement-and-designcenter)
+- [Silver Claw - Software Requirement and Design](#silver-claw---software-requirement-and-design)
     - [About this document:](#about-this-document)
   - [Table of Content](#table-of-content)
 - [Scope](#scope)

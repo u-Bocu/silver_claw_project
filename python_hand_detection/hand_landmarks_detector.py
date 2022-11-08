@@ -25,15 +25,15 @@ class hand_detector():
 
         self._capture = cv2.VideoCapture(0)
 
-    def get_landmarks(self):
+    def get_landmarks(self, handNo = 0):
         success, img = self._capture.read()
         imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
         self._results = self._hands.process(imgRGB)
 
         landmarks = None
-        if self._results.multi_hand_landmarks:
-            hand = self._results.multi_hand_landmarks[0]
+        if self._results.multi_hand_landmarks and len(self._results.multi_hand_landmarks) > handNo:
+            hand = self._results.multi_hand_landmarks[handNo]
             landmarks = []
 
             for id, lm in enumerate(hand.landmark):

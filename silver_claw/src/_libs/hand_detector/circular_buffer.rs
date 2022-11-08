@@ -16,6 +16,7 @@ const ACCELERATION_HI_HARDCAP: i32 = 300i32;
 const ACCELERATION_HI_SOFTCAP: i32 = 30i32;
 const ACCELERATION_LO_SOFTCAP: i32 = 10i32;
 
+#[derive(Debug, PartialEq, Clone)]
 pub struct circular_buffer {
     _data: Vec<(i32, i32)>,
     _index: usize,

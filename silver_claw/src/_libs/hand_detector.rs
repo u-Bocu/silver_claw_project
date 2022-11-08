@@ -10,6 +10,7 @@ use winapi::um::winuser;
 use pyo3::prelude::*;
 use pyo3::types::{PyAny, PyList};
 
+mod circular_buffer;
 mod geometry;
 
 #[derive(Debug, PartialEq, Copy, Clone)]
@@ -17,46 +18,95 @@ pub enum gesture {
     open,
     closed,
     none,
+
     thumb_index_pinched,
     thumb_middle_pinched,
+
     transition,
     void,
 }
 
 #[derive(Debug, PartialEq, Copy, Clone)]
+pub enum state {
+    asleep,
+    awake,
+
+    drag,
+    left_clicked,
+    right_clicked,
+
+    not_detected,
+}
+
+#[derive(Debug, PartialEq, Clone)]
 pub struct hand_state {
     pub _wrist_pos: Option<(i32, i32)>,
-    pub _gesture: gesture,
+    pub _state: state,
+
+    pub _buffer: circular_buffer::circular_buffer,
 }
 
-pub fn get_hand_state(landmarks: &PyAny) -> PyResult<hand_state> {
-    if landmarks.downcast::<PyList>().is_ok() {
-        let landmarks: &PyList = landmarks.downcast()?;
-
-        let landmarks_coordinates: Vec<(f32, f32, f32)> =
-            landmarks.extract::<Vec<(f32, f32, f32)>>()?;
-
-        Ok(hand_state {
-            _wrist_pos: Some(compute_wrist_pos(&landmarks_coordinates)),
-            _gesture: compute_gesture(&landmarks_coordinates),
-        })
-    } else {
-        Ok(hand_state {
+impl hand_state {
+    pub fn new() -> Self {
+        hand_state {
             _wrist_pos: None,
-            _gesture: gesture::void,
-        })
+            _state: state::asleep,
+            _buffer: circular_buffer::circular_buffer::default(),
+        }
     }
-}
 
-/**
- * Does exactly what you think it does.
- * Returns true is the gesture has changed between h0 and h1.
- */
-pub fn has_gesture_changed(h0: hand_state, h1: hand_state) -> bool {
-    if h0._gesture == h1._gesture || h0._gesture == gesture::void || h1._gesture == gesture::void {
-        false
-    } else {
-        true
+    pub fn compute_hand_state(&mut self, landmarks: &PyAny) -> PyResult<()> {
+        if landmarks.downcast::<PyList>().is_ok() {
+            let landmarks: &PyList = landmarks.downcast()?;
+
+            let landmarks_coordinates: Vec<(f32, f32, f32)> =
+                landmarks.extract::<Vec<(f32, f32, f32)>>()?;
+
+            let _gesture = compute_gesture(&landmarks_coordinates);
+
+            match _gesture {
+                gesture::open => {
+                    if self._state == state::asleep {
+                        self.compute_wrist_pos(&landmarks_coordinates);
+                    }
+                    self._state = state::awake;
+                }
+                gesture::closed => {
+                    if self._state != state::asleep {
+                        self._buffer.resize(3usize);
+                    }
+                    self._state = state::asleep;
+                    self._wrist_pos = None;
+                }
+                gesture::thumb_index_pinched => {
+                    let pos = compute_wrist_pos(&landmarks_coordinates);
+                    self._buffer.append(pos);
+                    self._buffer.reevaluate_size();
+
+                    self._wrist_pos = Some(self._buffer.mean_filter());
+
+                    self._state = state::drag;
+                }
+                gesture::thumb_middle_pinched => {
+                    if landmarks_coordinates[1].0 < landmarks_coordinates[0].0 {
+                        self._state = state::left_clicked;
+                    } else {
+                        self._state = state::right_clicked;
+                    }
+                }
+                gesture::void => {
+                    self._state = state::not_detected;
+                }
+                _ => {}
+            }
+        }
+
+        Ok(())
+    }
+
+    #[inline(always)]
+    fn compute_wrist_pos(&mut self, landmarks_coordinates: &Vec<(f32, f32, f32)>) {
+        self._wrist_pos = Some(compute_wrist_pos(landmarks_coordinates));
     }
 }
 
@@ -83,7 +133,7 @@ const XPOS_OFFSET: i32 = 400i32;
 
 /**
  * Returns the position where the mouse should be placed on the screen,
- * according to the thumb position on the image.
+ * according to the hand coordinates.
  */
 fn compute_wrist_pos(landmarks_coordinates: &Vec<(f32, f32, f32)>) -> (i32, i32) {
     unsafe {
@@ -101,7 +151,7 @@ fn compute_wrist_pos(landmarks_coordinates: &Vec<(f32, f32, f32)>) -> (i32, i32)
     let screen_width = unsafe { SCREEN_INFO._dimensions.unwrap().0 };
     let screen_height = unsafe { SCREEN_INFO._dimensions.unwrap().1 };
 
-    // Truncate thumb position to filter white noise.
+    // Truncate wrist position to filter white noise.
     let c: (f32, f32) = (
         (landmarks_coordinates[0].0 / 2f32.powi(TRUNCATURE_SIZE)) * 2f32.powi(TRUNCATURE_SIZE),
         (landmarks_coordinates[0].1 / 2f32.powi(TRUNCATURE_SIZE)) * 2f32.powi(TRUNCATURE_SIZE),
@@ -137,8 +187,8 @@ fn compute_wrist_pos(landmarks_coordinates: &Vec<(f32, f32, f32)>) -> (i32, i32)
     res
 }
 
-const LEFT_CLIC_RATIO: f32 = 2.25f32;
-const RIGHT_CLIC_RATIO: f32 = 2f32;
+const THUMB_INDEX_RATIO: f32 = 2.25f32;
+const THUMB_MIDDLE_RATIO: f32 = 2f32;
 const LEFT_CLIC_TRANSITION_RATIO: f32 = 2f32;
 const RIGHT_CLIC_TRANSITION_RATIO: f32 = 1.75f32;
 
@@ -165,9 +215,9 @@ fn compute_gesture(landmarks_coordinates: &Vec<(f32, f32, f32)>) -> gesture {
             + (landmarks_coordinates[8].2 - landmarks_coordinates[12].2).powi(2i32),
     );
 
-    if thumb_index_distance < (thumb_middle_distance / LEFT_CLIC_RATIO) {
+    if thumb_index_distance < (thumb_middle_distance / THUMB_INDEX_RATIO) {
         gesture::thumb_index_pinched
-    } else if thumb_middle_distance < (thumb_index_distance / RIGHT_CLIC_RATIO) {
+    } else if thumb_middle_distance < (thumb_index_distance / THUMB_MIDDLE_RATIO) {
         gesture::thumb_middle_pinched
     } else if thumb_index_distance < (thumb_middle_distance / LEFT_CLIC_TRANSITION_RATIO)
         || thumb_middle_distance < (thumb_index_distance / RIGHT_CLIC_TRANSITION_RATIO)
@@ -182,6 +232,9 @@ fn compute_gesture(landmarks_coordinates: &Vec<(f32, f32, f32)>) -> gesture {
     }
 }
 
+/**
+ * We will consider an angle between these values to be ~= 0°.
+ */
 const ANGLE_LOW_MARGIN: f32 = -10f32;
 const ANGLE_HIGH_MARGIN: f32 = 10f32;
 
