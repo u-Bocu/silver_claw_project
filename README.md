@@ -1,4 +1,4 @@
-## A service using the main camera to control the mouse on the main screen.
+## A service using the main camera to control the mouse.
 /!\ Windows only... for now
 
 needed python modules: (if you want to build the project yourself)
@@ -112,7 +112,7 @@ This operation shall allow the user to drive the mouse to all edge cases in orde
 ### Parameters
 The C++ launcher should allow the user to choose parameters for the Rust service.
 
-These are the following:
+The parameters are the following:
 - The user should be able to switch between left-handed mode and right-handed mode. (SRD_SCLAW_401)<br>
 - The user should be able to switch between absolute and relative for the mouse mode. (SRD_SCLAW_402)<br>
 - The user should be able to activate or deactivate the GUI. (SRD_SCLAW_403)<br>
