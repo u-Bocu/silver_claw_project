@@ -1,13 +1,5 @@
-import numpy as np
 import mediapipe as mp
 import cv2
-
-IMG_HEIGH = 150
-IMG_WIDTH = 150
-
-def start():
-    hd = hand_detector()
-    return hd.get_landmarks()
 
 class hand_detector():
     def __init__(self, mode = False, max_hands = 1, detection_con = 0.5, track_con = 0.5) -> None:
@@ -40,27 +32,3 @@ class hand_detector():
                 landmarks.append((lm.x, lm.y, lm.z))
 
         return landmarks
-
-    def draw_landmarks(self, img = 0, handNo = 0):
-        self.get_landmarks()
-
-        if img == 0:
-            img = np.zeros((IMG_HEIGH, IMG_WIDTH, 3), np.uint8)
-            img.flags.writeable = False # Make it a constant reference for performance purposes
-
-        if self._results.multi_hand_landmarks:
-            hand = self._results.multi_hand_landmarks[handNo]
-            i = 0
-
-            for id, lm in enumerate(hand.landmark):
-                h, w, c = img.shape
-                cx, cy = int(w - lm.x * w), int(lm.y * h)
-
-                cv2.circle(img, (cx, cy), 3, (255 - i, 0 + i, 255 - i), cv2.FILLED)
-                i += 20
-        
-        return img
-
-    def print_landmarks(self):
-        view = self.draw_landmarks()
-        cv2.imshow("Landmarks", view)
