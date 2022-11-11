@@ -66,10 +66,6 @@ The level of detail is provided out of common sense. The more a description is d
 
     An installer should be available at some point.
 
-- 11/11/2022 - Global architecture (M.REMOND)<br>
-    The software solution should also include a third architecture:
-    - A C++ executable used to launch and restart the Rust service and giving it different parameters.
-
 # Functional requirements
 ## Required states and modes
 ***
@@ -110,7 +106,7 @@ This operation shall allow the user to drive the mouse to all edge cases in orde
 - This operation shall compute a coefficient used later to ensure each position on the screen is available in mouse mode. (SRD_SCLAW_303)<br>
 
 ### Parameters
-The C++ launcher should allow the user to choose parameters for the Rust service.
+The Rust launcher should allow the user to choose parameters for the Rust main thread.
 
 The parameters are the following:
 - The user should be able to switch between left-handed mode and right-handed mode. (SRD_SCLAW_401)<br>
