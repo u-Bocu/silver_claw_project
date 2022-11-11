@@ -73,17 +73,17 @@ The level of detail is provided out of common sense. The more a description is d
 # Functional requirements
 ## Required states and modes
 ***
-- Silver Claw is a service which shall provide a way for the user to control its mouse with a camera. (SRD_SCLAW_001)<br> :white_check_mark:
-- Silver Claw should provide a way to switch between modes with hand control. (SRD_SCLAW_002)<br> :white_check_mark:
+- Silver Claw is a service which shall provide a way for the user to control its mouse with a camera. (SRD_SCLAW_001) :white_check_mark:<br> 
+- Silver Claw should provide a way to switch between modes with hand control. (SRD_SCLAW_002) :white_check_mark:<br> 
 
 ### Mouse mode (Absolute)
 This operating mode shall drive the mouse according to the user's hand position and gestures.<br>
 
-- This mode shall allow the user to left click. (SRD_SCLAW_101)<br> :white_check_mark:
-- This mode shall allow the user to right click. (SRD_SCLAW_102)<br> :white_check_mark:
+- This mode shall allow the user to left click. (SRD_SCLAW_101) :white_check_mark:<br> 
+- This mode shall allow the user to right click. (SRD_SCLAW_102) :white_check_mark:<br> 
 - This mode shall allow the user to scroll. (SRD_SCLAW_103) <br>
-- This mode shall allow the user to move the mouse. The cursor's position is set according to the hand's position in the camera capture zone. (SRD_SCLAW_104)<br> :white_check_mark:
-- This mode shall allow the user to switch to sleep. (SRD_SCLAW_105)<br> :white_check_mark:
+- This mode shall allow the user to move the mouse. The cursor's position is set according to the hand's position in the camera capture zone. (SRD_SCLAW_104) :white_check_mark:<br> 
+- This mode shall allow the user to switch to sleep. (SRD_SCLAW_105) :white_check_mark:<br> 
 
 ### Mouse mode (Relative)
 This operating mode shall drive the mouse according to the user's hand movements and gestures.<br>
@@ -98,7 +98,7 @@ This operating mode shall drive the mouse according to the user's hand movements
 This operating mode shall not control the mouse. It should only be possible to wake up the service. <br>
 
 - This mode should take the least resources possible. (SRD_SCLAW_201)<br>
-- This mode shall allow the user to wake up the program with an open hand gesture. (SRD_SCLAW_202) <br> :white_check_mark:
+- This mode shall allow the user to wake up the program with an open hand gesture. (SRD_SCLAW_202) :white_check_mark:<br> 
 
 ## Module capability requirements
 
