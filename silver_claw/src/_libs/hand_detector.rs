@@ -120,7 +120,8 @@ const Y_OFFSET_MULTIPLICATOR: f32 = 0.35f32;
 /**
  * Screen dimensions singleton.
  *
- * /!\ Windows only for now
+ * /!\ Windows only for now.
+ * TODO: Get screen info for MacOS and Ubuntu.
  */
 
 struct screen_info {
@@ -140,10 +141,18 @@ fn compute_wrist_pos(landmarks_coordinates: &Vec<(f32, f32, f32)>) -> (i32, i32)
         match SCREEN_INFO._dimensions {
             Some(_a) => (),
             None => {
-                SCREEN_INFO._dimensions = Some((
-                    winuser::GetSystemMetrics(winuser::SM_CXSCREEN) as f32,
-                    winuser::GetSystemMetrics(winuser::SM_CYSCREEN) as f32,
-                ));
+                #[cfg(target_family = "windows")]
+                {
+                    SCREEN_INFO._dimensions = Some((
+                        winuser::GetSystemMetrics(winuser::SM_CXSCREEN) as f32,
+                        winuser::GetSystemMetrics(winuser::SM_CYSCREEN) as f32,
+                    ));
+                }
+
+                #[cfg(target_family = "unix")]
+                {}
+                #[cfg(target_os = "macos")]
+                {}
             }
         }
     }

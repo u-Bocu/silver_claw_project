@@ -39,7 +39,6 @@ class hand_detector():
             for id, lm in enumerate(hand.landmark):
                 landmarks.append((lm.x, lm.y, lm.z))
 
-        #print(landmarks)
         return landmarks
 
     def draw_landmarks(self, img = 0, handNo = 0):

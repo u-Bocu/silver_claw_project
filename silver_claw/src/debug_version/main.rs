@@ -15,8 +15,16 @@ use silver_claw_lib::*;
 
 fn main() -> PyResult<()> {
     // Create taskbar icon
-    let mut nid: winapi::um::shellapi::NOTIFYICONDATAW = taskbar::create();
-    taskbar::delete(&mut nid);
+    #[cfg(target_family = "windows")]
+    {
+        let mut nid: winapi::um::shellapi::NOTIFYICONDATAW = taskbar::create();
+        taskbar::delete(&mut nid);
+    }
+
+    #[cfg(target_family = "unix")]
+    {}
+    #[cfg(target_os = "macos")]
+    {}
 
     // Ask for calibration mode.
     println!("Do you want to calibrate the system ? o/n");
@@ -69,8 +77,11 @@ fn main() -> PyResult<()> {
                     .extract()?,
             )?;
 
-            println!("{:?}", hands.0._state);
-            println!("{:?}", hands.1._state);
+            #[cfg(debug_assertions)]
+            {
+                println!("{:?}", hands.0._state);
+                println!("{:?}", hands.1._state);
+            }
 
             if hands.0._state == hand_detector::state::awake
                 || hands.1._state == hand_detector::state::awake
