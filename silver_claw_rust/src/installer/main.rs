@@ -18,7 +18,7 @@ fn main() -> windows_service::Result<()> {
         service_type: ServiceType::OWN_PROCESS,
         start_type: ServiceStartType::OnDemand,
         error_control: ServiceErrorControl::Normal,
-        executable_path: PathBuf::from("C:/Users/mremond/Documents/DevProjects/Rust/silver_claw_project/silver_claw/target/debug/silver_claw_service.exe"),
+        executable_path: PathBuf::from("C:/Users/mremond/3D Objects/Projets Dev/silver_claw_project/silver_claw_rust/target/debug/silver_claw_service.exe"),
         launch_arguments: vec![],
         dependencies: vec![],
 

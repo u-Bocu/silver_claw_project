@@ -1,10 +1,16 @@
-// An attribute to allow non CamelCase and let snake_case be default convention.
 #![allow(non_camel_case_types)]
 #![warn(non_snake_case)]
 
 use enigo::*;
+use winapi::shared::windef::*;
+use winapi::um::libloaderapi::*;
+use winapi::um::winuser::*;
 
+use std::ffi::c_void;
+use std::ffi::CString;
 use std::io;
+use std::mem::zeroed;
+use std::ptr::null;
 
 use pyo3::prelude::*;
 use pyo3::py_run;
@@ -15,10 +21,44 @@ use silver_claw_lib::*;
 
 fn main() -> PyResult<()> {
     // Create taskbar icon
+    let hwnd: HWND;
     #[cfg(target_family = "windows")]
     {
-        let mut nid: winapi::um::shellapi::NOTIFYICONDATAW = taskbar::create();
-        taskbar::delete(&mut nid);
+        unsafe {
+            // Create Class
+            let mut wc: WNDCLASSA = zeroed();
+            let class_name = CString::new("lpClassName").unwrap();
+            let window_name = CString::new("lpWindowName").unwrap();
+
+            wc.lpfnWndProc = Some(taskbar::window_proc);
+
+            wc.hInstance = GetModuleHandleA(null());
+            wc.lpszClassName = class_name.as_ptr() as *const i8;
+
+            RegisterClassA(&wc);
+
+            // Create Window
+            hwnd = CreateWindowExA(
+                0,
+                class_name.as_ptr() as *const i8,
+                window_name.as_ptr() as *const i8,
+                winapi::um::winuser::WS_OVERLAPPEDWINDOW,
+                winapi::um::winuser::CW_USEDEFAULT,
+                winapi::um::winuser::CW_USEDEFAULT,
+                winapi::um::winuser::CW_USEDEFAULT,
+                winapi::um::winuser::CW_USEDEFAULT,
+                null::<*mut HWND__>() as *mut HWND__,
+                null::<*mut HMENU__>() as *mut HMENU__,
+                wc.hInstance,
+                null::<*mut c_void>() as *mut c_void,
+            );
+
+            // Show Window
+            ShowWindow(hwnd, 0);
+
+            // Create Taskbar
+            taskbar::create(hwnd);
+        }
     }
 
     #[cfg(target_family = "unix")]
@@ -67,6 +107,10 @@ fn main() -> PyResult<()> {
 
         // Main Loop
         loop {
+            let mut msg: MSG = unsafe { zeroed() };
+
+            unsafe { PeekMessageA(&mut msg, hwnd, WM_MOUSEFIRST, WM_MOUSELAST, PM_REMOVE) };
+
             hands.0.compute_hand_state(
                 py.eval(code_get_first_hand, None, Some(&locals))?
                     .extract()?,
