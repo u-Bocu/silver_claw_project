@@ -109,7 +109,7 @@ fn main() -> PyResult<()> {
         loop {
             let mut msg: MSG = unsafe { zeroed() };
 
-            unsafe { PeekMessageA(&mut msg, hwnd, WM_MOUSEFIRST, WM_MOUSELAST, PM_REMOVE) };
+            unsafe { PeekMessageA(&mut msg, hwnd, WM_RBUTTONDOWN, WM_RBUTTONDOWN, PM_REMOVE) };
 
             hands.0.compute_hand_state(
                 py.eval(code_get_first_hand, None, Some(&locals))?
