@@ -51,6 +51,7 @@ The level of detail is provided out of common sense. The more a description is d
   - [Module capability requirements](#module-capability-requirements)
     - [Calibration](#calibration)
     - [Parameters](#parameters)
+    - [Load calibration and parameters](#load-calibration-and-parameters)
 
 ***
 # Scope
@@ -113,3 +114,9 @@ The parameters are the following:
 - The user should be able to switch between absolute and relative for the mouse mode. (SRD_SCLAW_402)<br>
 - The user should be able to activate or deactivate the GUI. (SRD_SCLAW_403)<br>
 - The user should be able to set a different cursor when the mouse is controlled by hand. (SRD_SCLAW_404)<br>
+
+### Load calibration and parameters
+The main program should be able to read calibration data and selected parameters from a YAML file. If no file is detected (i.e.: For the first run), it should ask the user to calibrate and choose some parameters.
+
+- This operation should read a configuration YAML file. (SRD_SCLAW_501)<br>
+- This operation should launch a calibration if needed. (SRD_SCLAW_502)<br>

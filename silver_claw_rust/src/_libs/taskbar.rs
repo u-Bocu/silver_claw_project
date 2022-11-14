@@ -45,7 +45,7 @@ pub unsafe extern "system" fn window_proc(
 
 pub unsafe fn create(hwnd: HWND) -> winapi::um::shellapi::NOTIFYICONDATAW {
     let WM_MYMESSAGE = winapi::um::winuser::WM_APP + 100;
-    let trayToolTip: String = "text".to_string();
+    let trayToolTip: String = "Silver Claw Mouse Driver".to_string();
     let mut trayToolTipInt: [u16; 128] = [0; 128];
     let trayToolTipOS: &OsStr = OsStr::new(&*trayToolTip);
     let trayToolTipUTF16: Vec<u16> = trayToolTipOS.encode_wide().collect::<Vec<u16>>();
@@ -57,6 +57,17 @@ pub unsafe fn create(hwnd: HWND) -> winapi::um::shellapi::NOTIFYICONDATAW {
     let icon: *const u16 = iconAddressUTF16.as_ptr();
 
     let mut nid: winapi::um::shellapi::NOTIFYICONDATAW = zeroed();
+
+    #[cfg(debug_assertions)]
+    {
+        println!(
+            "icon: {:?}",
+            winapi::um::winuser::LoadIconW(
+                winapi::um::libloaderapi::GetModuleHandleW(null_mut()),
+                icon
+            )
+        );
+    }
 
     nid.cbSize = size_of::<winapi::um::shellapi::NOTIFYICONDATAW>() as u32;
     nid.hWnd = hwnd;

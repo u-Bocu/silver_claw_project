@@ -80,7 +80,7 @@ fn run_service(_arguments: Vec<OsString>) -> Result<(), Error> {
 
     // Init
     // Windows API is unsafe af...
-    /*unsafe {
+    unsafe {
         // Create Class
         let mut wc: WNDCLASSA = zeroed();
         let class_name = CString::new("lpClassName").unwrap();
@@ -114,7 +114,7 @@ fn run_service(_arguments: Vec<OsString>) -> Result<(), Error> {
 
         // Create Taskbar
         taskbar::create(hwnd);
-    }*/
+    }
 
     loop {
         // Main loop
