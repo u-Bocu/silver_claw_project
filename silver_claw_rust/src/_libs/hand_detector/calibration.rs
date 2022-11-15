@@ -7,6 +7,9 @@ pub struct calibration {
     pub x_offset: i32,
     pub y_offset: i32,
 
+    pub x_offset_multiplicator: f32,
+    pub y_offset_multiplicator: f32,
+
     pub x_speed_multiplicator: f32,
     pub y_speed_multiplicator: f32,
 }
@@ -97,6 +100,9 @@ impl config {
                 x_offset: 250i32,
                 y_offset: 400i32,
 
+                x_offset_multiplicator: 0.25f32,
+                y_offset_multiplicator: 0.35f32,
+
                 x_speed_multiplicator: 10f32 / 5f32,
                 y_speed_multiplicator: 10f32 / 6.5f32,
             },
@@ -111,4 +117,4 @@ impl config {
     fn calibrate(&mut self) {}
 }
 
-thread_local!(static CONFIG: config = config::new());
+thread_local!( pub(crate) static CONFIG: config = config::new());

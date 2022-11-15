@@ -35,6 +35,9 @@ build:
 build_debug:
 	cargo build --bin silver_claw_debug_version
 
+build_unit_tests:
+	cargo build --bin silver_claw_unit_tests
+
 build_rls:
 	cargo build --release
 
@@ -51,6 +54,9 @@ copy_rls: build_rls
 # Run
 run_debug: copy_debug
 	cargo run --bin silver_claw_debug_version
+
+run_unit_tests: build_unit_tests
+	cargo run --bin silver_claw_unit_tests
 
 run_installer: copy
 	cargo run --bin silver_claw_installer

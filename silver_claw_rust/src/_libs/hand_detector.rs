@@ -111,13 +111,6 @@ impl hand_state {
     }
 }
 
-const TRUNCATURE_SIZE: i32 = 10i32;
-const X_SPEED_MULTIPLICATOR: f32 = 10f32 / 5f32;
-const Y_SPEED_MULTIPLICATOR: f32 = 10f32 / 6.5f32;
-
-const X_OFFSET_MULTIPLICATOR: f32 = 0.25f32;
-const Y_OFFSET_MULTIPLICATOR: f32 = 0.35f32;
-
 /**
  * Screen dimensions singleton.
  *
@@ -130,8 +123,6 @@ struct screen_info {
 }
 
 static mut SCREEN_INFO: screen_info = screen_info { _dimensions: None };
-const YPOS_OFFSET: i32 = 250i32;
-const XPOS_OFFSET: i32 = 400i32;
 
 /**
  * Returns the position where the mouse should be placed on the screen,
@@ -161,26 +152,26 @@ fn compute_wrist_pos(landmarks_coordinates: &Vec<(f32, f32, f32)>) -> (i32, i32)
     let screen_width = unsafe { SCREEN_INFO._dimensions.unwrap().0 };
     let screen_height = unsafe { SCREEN_INFO._dimensions.unwrap().1 };
 
-    // Truncate wrist position to filter white noise.
-    let c: (f32, f32) = (
-        (landmarks_coordinates[0].0 / 2f32.powi(TRUNCATURE_SIZE)) * 2f32.powi(TRUNCATURE_SIZE),
-        (landmarks_coordinates[0].1 / 2f32.powi(TRUNCATURE_SIZE)) * 2f32.powi(TRUNCATURE_SIZE),
-    );
-
     let mut is_left_hand: i32 = 1;
 
     if landmarks_coordinates[1].0 > landmarks_coordinates[0].0 {
         is_left_hand = -1i32;
     }
 
-    let mut res: (i32, i32) = (
-        ((((screen_width - c.0 * screen_width) * X_SPEED_MULTIPLICATOR)
-            - (screen_width * X_OFFSET_MULTIPLICATOR)) as i32)
-            + (is_left_hand * XPOS_OFFSET),
-        (((c.1 * screen_height * Y_SPEED_MULTIPLICATOR) - (screen_height * Y_OFFSET_MULTIPLICATOR))
-            as i32)
-            - YPOS_OFFSET,
-    );
+    let mut res: (i32, i32) = calibration::CONFIG.with(|config| {
+        (
+            ((((screen_width - landmarks_coordinates[0].0 * screen_width)
+                * config._calibration.x_speed_multiplicator)
+                - (screen_width * config._calibration.x_offset_multiplicator)) as i32)
+                + (is_left_hand * config._calibration.x_offset),
+            (((landmarks_coordinates[0].1
+                * screen_height
+                * config._calibration.y_speed_multiplicator)
+                - (screen_height * config._calibration.y_offset_multiplicator))
+                as i32)
+                - config._calibration.y_offset,
+        )
+    });
 
     if res.0 < 0i32 {
         res.0 = 0i32;
