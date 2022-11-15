@@ -15,6 +15,10 @@ path = "src/installer/main.rs"
 name = "silver_claw_debug_version"
 path = "src/debug_version/main.rs"
 
+[[bin]]
+name = "silver_claw_unit_tests"
+path = "src/unit_tests/main.rs"
+
 [lib]
 name = "silver_claw_lib"
 path = "src/_libs/libs.rs"

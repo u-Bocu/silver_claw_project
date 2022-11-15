@@ -2,21 +2,27 @@
 
 extern crate winapi;
 
-use std::ffi::OsStr;
+use std::ffi::c_void;
+use std::ffi::{CString, OsStr};
 use std::mem::{size_of, zeroed};
 use std::os::windows::ffi::OsStrExt;
-use std::ptr::null_mut;
+use std::ptr::{null, null_mut};
 
 use winapi::shared::minwindef::{LPARAM, LRESULT, UINT, WPARAM};
-use winapi::shared::windef::HWND;
-use winapi::um::winuser::{DefWindowProcA, PostQuitMessage, WM_RBUTTONDOWN};
+use winapi::shared::windef::{HMENU__, HWND, HWND__};
+use winapi::um::libloaderapi::GetModuleHandleA;
+use winapi::um::winuser::{
+    CreateWindowExA, DefWindowProcA, PostQuitMessage, RegisterClassA, ShowWindow, WM_RBUTTONDOWN,
+    WNDCLASSA,
+};
 
 const MAGIC_ID: UINT = 2209;
+pub static mut EXIT: bool = false;
 
 /**
  * Window procedure called each time the user interacts with the notification icon.
  */
-pub unsafe extern "system" fn window_proc(
+unsafe extern "system" fn window_proc(
     hwnd: HWND,
     uMsg: UINT,
     wParam: WPARAM,
@@ -29,21 +35,45 @@ pub unsafe extern "system" fn window_proc(
 
     if (lParam as UINT) == WM_RBUTTONDOWN {
         println!("Right clic on icon");
-        if uMsg == MAGIC_ID {
-            #[cfg(debug_assertions)]
-            {
-                // idk why thread ID is wrong but... it's fine
-                println!("Magic ID");
-            }
-
-            PostQuitMessage(0);
-        }
+        EXIT = true;
     }
 
     return DefWindowProcA(hwnd, uMsg, wParam, lParam);
 }
 
-pub unsafe fn create(hwnd: HWND) -> winapi::um::shellapi::NOTIFYICONDATAW {
+pub unsafe fn create() -> HWND {
+    // Create Class
+    let mut wc: WNDCLASSA = zeroed();
+    let class_name = CString::new("lpClassName").unwrap();
+    let window_name = CString::new("lpWindowName").unwrap();
+
+    wc.lpfnWndProc = Some(window_proc);
+
+    wc.hInstance = GetModuleHandleA(null());
+    wc.lpszClassName = class_name.as_ptr() as *const i8;
+
+    RegisterClassA(&wc);
+
+    // Create Window
+    let hwnd = CreateWindowExA(
+        0,
+        class_name.as_ptr() as *const i8,
+        window_name.as_ptr() as *const i8,
+        winapi::um::winuser::WS_OVERLAPPEDWINDOW,
+        winapi::um::winuser::CW_USEDEFAULT,
+        winapi::um::winuser::CW_USEDEFAULT,
+        winapi::um::winuser::CW_USEDEFAULT,
+        winapi::um::winuser::CW_USEDEFAULT,
+        null::<*mut HWND__>() as *mut HWND__,
+        null::<*mut HMENU__>() as *mut HMENU__,
+        wc.hInstance,
+        null::<*mut c_void>() as *mut c_void,
+    );
+
+    // Show Window
+    ShowWindow(hwnd, 0);
+
+    // Create Taskbar
     let WM_MYMESSAGE = winapi::um::winuser::WM_APP + 100;
     let trayToolTip: String = "Silver Claw Mouse Driver".to_string();
     let mut trayToolTipInt: [u16; 128] = [0; 128];
@@ -80,7 +110,7 @@ pub unsafe fn create(hwnd: HWND) -> winapi::um::shellapi::NOTIFYICONDATAW {
         | winapi::um::shellapi::NIF_TIP;
 
     winapi::um::shellapi::Shell_NotifyIconW(winapi::um::shellapi::NIM_ADD, &mut nid);
-    nid
+    hwnd
 }
 
 pub unsafe fn delete(nid: &mut winapi::um::shellapi::NOTIFYICONDATAW) {

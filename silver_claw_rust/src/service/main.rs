@@ -80,41 +80,6 @@ fn run_service(_arguments: Vec<OsString>) -> Result<(), Error> {
 
     // Init
     // Windows API is unsafe af...
-    unsafe {
-        // Create Class
-        let mut wc: WNDCLASSA = zeroed();
-        let class_name = CString::new("lpClassName").unwrap();
-        let window_name = CString::new("lpWindowName").unwrap();
-
-        wc.lpfnWndProc = Some(taskbar::window_proc);
-
-        wc.hInstance = GetModuleHandleA(null());
-        wc.lpszClassName = class_name.as_ptr() as *const i8;
-
-        RegisterClassA(&wc);
-
-        // Create Window
-        let hwnd: HWND = CreateWindowExA(
-            0,
-            class_name.as_ptr() as *const i8,
-            window_name.as_ptr() as *const i8,
-            winapi::um::winuser::WS_OVERLAPPEDWINDOW,
-            winapi::um::winuser::CW_USEDEFAULT,
-            winapi::um::winuser::CW_USEDEFAULT,
-            winapi::um::winuser::CW_USEDEFAULT,
-            winapi::um::winuser::CW_USEDEFAULT,
-            null::<*mut HWND__>() as *mut HWND__,
-            null::<*mut HMENU__>() as *mut HMENU__,
-            wc.hInstance,
-            null::<*mut c_void>() as *mut c_void,
-        );
-
-        // Show Window
-        ShowWindow(hwnd, 0);
-
-        // Create Taskbar
-        taskbar::create(hwnd);
-    }
 
     loop {
         // Main loop

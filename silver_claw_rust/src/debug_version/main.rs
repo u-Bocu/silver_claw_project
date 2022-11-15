@@ -3,14 +3,10 @@
 
 use enigo::*;
 use winapi::shared::windef::*;
-use winapi::um::libloaderapi::*;
 use winapi::um::winuser::*;
 
-use std::ffi::c_void;
-use std::ffi::CString;
 use std::io;
 use std::mem::zeroed;
-use std::ptr::null;
 
 use pyo3::prelude::*;
 use pyo3::py_run;
@@ -24,41 +20,7 @@ fn main() -> PyResult<()> {
     let hwnd: HWND;
     #[cfg(target_family = "windows")]
     {
-        unsafe {
-            // Create Class
-            let mut wc: WNDCLASSA = zeroed();
-            let class_name = CString::new("lpClassName").unwrap();
-            let window_name = CString::new("lpWindowName").unwrap();
-
-            wc.lpfnWndProc = Some(taskbar::window_proc);
-
-            wc.hInstance = GetModuleHandleA(null());
-            wc.lpszClassName = class_name.as_ptr() as *const i8;
-
-            RegisterClassA(&wc);
-
-            // Create Window
-            hwnd = CreateWindowExA(
-                0,
-                class_name.as_ptr() as *const i8,
-                window_name.as_ptr() as *const i8,
-                winapi::um::winuser::WS_OVERLAPPEDWINDOW,
-                winapi::um::winuser::CW_USEDEFAULT,
-                winapi::um::winuser::CW_USEDEFAULT,
-                winapi::um::winuser::CW_USEDEFAULT,
-                winapi::um::winuser::CW_USEDEFAULT,
-                null::<*mut HWND__>() as *mut HWND__,
-                null::<*mut HMENU__>() as *mut HMENU__,
-                wc.hInstance,
-                null::<*mut c_void>() as *mut c_void,
-            );
-
-            // Show Window
-            ShowWindow(hwnd, 0);
-
-            // Create Taskbar
-            taskbar::create(hwnd);
-        }
+        hwnd = unsafe { taskbar::create() }
     }
 
     #[cfg(target_family = "unix")]
@@ -107,6 +69,9 @@ fn main() -> PyResult<()> {
 
         // Main Loop
         loop {
+            if unsafe { taskbar::EXIT == true } {
+                return Ok(());
+            }
             let mut msg: MSG = unsafe { zeroed() };
 
             unsafe { PeekMessageA(&mut msg, hwnd, WM_RBUTTONDOWN, WM_RBUTTONDOWN, PM_REMOVE) };

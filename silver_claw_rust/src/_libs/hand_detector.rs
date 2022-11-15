@@ -10,6 +10,7 @@ use winapi::um::winuser;
 use pyo3::prelude::*;
 use pyo3::types::{PyAny, PyList};
 
+mod calibration;
 mod circular_buffer;
 mod geometry;
 

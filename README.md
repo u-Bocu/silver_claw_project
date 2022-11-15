@@ -85,10 +85,10 @@ This operating mode shall drive the mouse according to the user's hand position 
 ### Mouse mode (Relative)
 This operating mode shall drive the mouse according to the user's hand movements and gestures.<br>
 
-- This mode shall allow the user to left click. (SRD_SCLAW_101)<br>
-- This mode shall allow the user to right click. (SRD_SCLAW_102)<br>
+- This mode shall allow the user to left click. (SRD_SCLAW_101) :white_check_mark:<br>
+- This mode shall allow the user to right click. (SRD_SCLAW_102) :white_check_mark:<br>
 - This mode shall allow the user to scroll. (SRD_SCLAW_103) <br>
-- This mode shall allow the user to switch to sleep. (SRD_SCLAW_105)<br>
+- This mode shall allow the user to switch to sleep. (SRD_SCLAW_105) :white_check_mark:<br>
 - This mode shall allow the user to move the mouse. The cursor's position is moved from it's previous position according to the hand's movements. (SRD_SCLAW_106)<br>
 
 ### Sleep mode
@@ -112,6 +112,7 @@ The Rust launcher should allow the user to choose parameters for the Rust main t
 The parameters are the following:
 - The user should be able to switch between left-handed mode and right-handed mode. (SRD_SCLAW_401)<br>
 - The user should be able to switch between absolute and relative for the mouse mode. (SRD_SCLAW_402)<br>
+- The user should be able to switch between 1-hand or 2-hands controls (absolute mode only). (SRD_SCLAW_4021)<br>
 - The user should be able to activate or deactivate the GUI. (SRD_SCLAW_403)<br>
 - The user should be able to set a different cursor when the mouse is controlled by hand. (SRD_SCLAW_404)<br>
 
