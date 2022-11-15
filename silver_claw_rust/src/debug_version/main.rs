@@ -5,7 +5,6 @@ use enigo::*;
 use winapi::shared::windef::*;
 use winapi::um::winuser::*;
 
-use std::io;
 use std::mem::zeroed;
 
 use pyo3::prelude::*;
@@ -13,6 +12,7 @@ use pyo3::py_run;
 use pyo3::types::IntoPyDict;
 
 // Local module
+use silver_claw_lib::hand_detector::calibration;
 use silver_claw_lib::*;
 
 fn main() -> PyResult<()> {
@@ -58,7 +58,10 @@ fn main() -> PyResult<()> {
             }
             let mut msg: MSG = unsafe { zeroed() };
 
-            unsafe { PeekMessageA(&mut msg, hwnd, WM_RBUTTONDOWN, WM_RBUTTONDOWN, PM_REMOVE) };
+            #[cfg(target_family = "windows")]
+            unsafe {
+                PeekMessageA(&mut msg, hwnd, WM_RBUTTONDOWN, WM_RBUTTONDOWN, PM_REMOVE)
+            };
 
             hands.0.compute_hand_state(
                 py.eval(code_get_first_hand, None, Some(&locals))?
@@ -95,7 +98,18 @@ fn main() -> PyResult<()> {
                     },
                 };
 
-                e.mouse_move_to(new_position.0, new_position.1);
+                if calibration::CONFIG.with(|config| config._mode.get_mouse_mode())
+                    == hand_detector::calibration::mouse_mode::absolute
+                {
+                    e.mouse_move_to(new_position.0, new_position.1);
+                } else {
+                    let new_position: (i32, i32) = match hands.0._shift {
+                        Some(pos) => (pos.0, pos.1),
+                        None => (0i32, 0i32),
+                    };
+
+                    e.mouse_move_relative(new_position.0, new_position.1);
+                }
 
                 if hands.0._state == hand_detector::state::left_clicked
                     || hands.1._state == hand_detector::state::left_clicked

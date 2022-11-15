@@ -1,6 +1,10 @@
+#![allow(dead_code)]
+#![allow(non_camel_case_types)]
+#![warn(non_snake_case)]
+
 use winapi::um::winuser;
 
-thread_local!( pub(crate) static CONFIG: config = config::new());
+thread_local!( pub static CONFIG: config = config::new());
 thread_local!( pub(crate) static SCREEN_INFO: screen_info = screen_info::default());
 
 /**

@@ -12,8 +12,7 @@ use winapi::shared::minwindef::{LPARAM, LRESULT, UINT, WPARAM};
 use winapi::shared::windef::{HMENU__, HWND, HWND__};
 use winapi::um::libloaderapi::GetModuleHandleA;
 use winapi::um::winuser::{
-    CreateWindowExA, DefWindowProcA, PostQuitMessage, RegisterClassA, ShowWindow, WM_RBUTTONDOWN,
-    WNDCLASSA,
+    CreateWindowExA, DefWindowProcA, RegisterClassA, ShowWindow, WM_RBUTTONDOWN, WNDCLASSA,
 };
 
 const MAGIC_ID: UINT = 2209;

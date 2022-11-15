@@ -1,16 +1,9 @@
-use std::ptr::null;
+use std::ffi::OsString;
 use std::sync::mpsc;
 use std::time::Duration;
-use std::{ffi::OsString, mem::zeroed};
 
 use anyhow::{Error, Result};
-use std::ffi::CString;
 
-use winapi::ctypes::c_void;
-use winapi::shared::windef::{HMENU__, HWND, HWND__};
-
-use winapi::um::libloaderapi::GetModuleHandleA;
-use winapi::um::winuser::{CreateWindowExA, RegisterClassA, ShowWindow, WNDCLASSA};
 use windows_service::{
     define_windows_service,
     service::{
@@ -20,8 +13,6 @@ use windows_service::{
     service_control_handler::{self, ServiceControlHandlerResult},
     service_dispatcher,
 };
-
-use silver_claw_lib::*;
 
 define_windows_service!(ffi_service_main, service_main);
 

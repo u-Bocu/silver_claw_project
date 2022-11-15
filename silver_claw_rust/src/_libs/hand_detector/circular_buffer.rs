@@ -1,6 +1,4 @@
-// An attribute to hide warnings for unused code.
 #![allow(dead_code)]
-// An attribute to allow non CamelCase and let snake_case be default convention.
 #![allow(non_camel_case_types)]
 #![warn(non_snake_case)]
 

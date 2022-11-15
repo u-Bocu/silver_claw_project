@@ -1,16 +1,10 @@
-// An attribute to hide warnings for unused code/variables.
-#![allow(dead_code)]
-#![allow(unused_variables)]
-// An attribute to allow non CamelCase and let snake_case be default convention.
 #![allow(non_camel_case_types)]
 #![warn(non_snake_case)]
-
-use winapi::um::winuser;
 
 use pyo3::prelude::*;
 use pyo3::types::{PyAny, PyList};
 
-mod calibration;
+pub mod calibration;
 mod circular_buffer;
 mod geometry;
 
@@ -42,6 +36,7 @@ pub enum state {
 #[derive(Debug, PartialEq, Clone)]
 pub struct hand_state {
     pub _wrist_pos: Option<(i32, i32)>,
+    pub _shift: Option<(i32, i32)>,
     pub _state: state,
 
     pub _buffer: circular_buffer::circular_buffer,
@@ -51,6 +46,7 @@ impl hand_state {
     pub fn new() -> Self {
         hand_state {
             _wrist_pos: None,
+            _shift: None,
             _state: state::asleep,
             _buffer: circular_buffer::circular_buffer::default(),
         }
@@ -84,7 +80,12 @@ impl hand_state {
                     self._buffer.append(pos);
                     self._buffer.reevaluate_size();
 
-                    self._wrist_pos = Some(self._buffer.mean_filter());
+                    let wrist_pos = self._buffer.mean_filter();
+                    self._shift = match self._wrist_pos {
+                        Some(pos) => Some((wrist_pos.0 - pos.0, wrist_pos.1 - pos.1)),
+                        None => None,
+                    };
+                    self._wrist_pos = Some(wrist_pos);
 
                     self._state = state::drag;
                 }
@@ -181,12 +182,6 @@ fn compute_gesture(landmarks_coordinates: &Vec<(f32, f32, f32)>) -> gesture {
         (landmarks_coordinates[4].0 - landmarks_coordinates[12].0).powi(2i32)
             + (landmarks_coordinates[4].1 - landmarks_coordinates[12].1).powi(2i32)
             + (landmarks_coordinates[4].2 - landmarks_coordinates[12].2).powi(2i32),
-    );
-
-    let index_middle_distance: f32 = f32::sqrt(
-        (landmarks_coordinates[8].0 - landmarks_coordinates[12].0).powi(2i32)
-            + (landmarks_coordinates[8].1 - landmarks_coordinates[12].1).powi(2i32)
-            + (landmarks_coordinates[8].2 - landmarks_coordinates[12].2).powi(2i32),
     );
 
     if thumb_index_distance < (thumb_middle_distance / THUMB_INDEX_RATIO) {

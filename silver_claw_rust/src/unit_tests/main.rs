@@ -2,7 +2,7 @@
 #![warn(non_snake_case)]
 
 // Local module
-use silver_claw_lib::*;
+//use silver_claw_lib::*;
 
 // Test suites
 mod circular_buffer_test_suite;
