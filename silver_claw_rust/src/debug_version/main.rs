@@ -28,20 +28,6 @@ fn main() -> PyResult<()> {
     #[cfg(target_os = "macos")]
     {}
 
-    // Ask for calibration mode.
-    println!("Do you want to calibrate the system ? o/n");
-    let mut input: String = String::new();
-
-    io::stdin()
-        .read_line(&mut input)
-        .expect("Failed to read line");
-
-    let mut calibration: bool = false;
-
-    if input.eq(&String::from('o')) {
-        calibration = true;
-    }
-
     // Init
     pyo3::prepare_freethreaded_python();
     Python::with_gil(|py| {
@@ -64,8 +50,6 @@ fn main() -> PyResult<()> {
         );
 
         let mut last_state: hand_detector::state = hand_detector::state::asleep;
-
-        if calibration {}
 
         // Main Loop
         loop {
@@ -144,28 +128,3 @@ fn main() -> PyResult<()> {
         }
     })
 }
-
-/*fn calibrate(py: Python, locals: &PyDict, code: &str) -> PyResult<()> {
-    let mut previous_hand =
-        hand_detector::get_hand_state(py.eval(code, None, Some(&locals))?.extract()?)?;
-
-    let mut sleep: bool = true;
-
-    loop {
-        let hand = hand_detector::get_hand_state(py.eval(code, None, Some(&locals))?.extract()?)?;
-
-        if sleep {
-            if hand._gesture == hand_detector::gesture::open {
-                sleep = false;
-            }
-        } else {
-            match hand._gesture {
-                hand_detector::gesture::void => {}
-                hand_detector::gesture::closed => sleep = true,
-                _ => {}
-            }
-
-            previous_hand = hand;
-        }
-    }
-}*/
