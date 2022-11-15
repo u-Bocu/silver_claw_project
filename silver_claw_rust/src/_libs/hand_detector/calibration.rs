@@ -1,3 +1,29 @@
+use winapi::um::winuser;
+
+thread_local!( pub(crate) static CONFIG: config = config::new());
+thread_local!( pub(crate) static SCREEN_INFO: screen_info = screen_info::new());
+
+/**
+ * Screen dimensions singleton.
+ */
+
+pub struct screen_info {
+    pub _dimensions: (f32, f32),
+}
+
+impl screen_info {
+    pub fn new() -> Self {
+        screen_info {
+            _dimensions: unsafe {
+                (
+                    winuser::GetSystemMetrics(winuser::SM_CXSCREEN) as f32,
+                    winuser::GetSystemMetrics(winuser::SM_CYSCREEN) as f32,
+                )
+            },
+        }
+    }
+}
+
 /**
  * Configuration singleton.
  */
@@ -15,13 +41,13 @@ pub struct calibration {
 }
 
 #[derive(Debug, PartialEq)]
-enum mouse_mode {
+pub enum mouse_mode {
     absolute,
     relative,
 }
 
 #[derive(Debug, PartialEq)]
-enum main_hand {
+pub enum main_hand {
     left,
     right,
 }
@@ -60,7 +86,7 @@ impl mode {
         }
     }
 
-    fn get_mouse_mode(&self) -> mouse_mode {
+    pub fn get_mouse_mode(&self) -> mouse_mode {
         if self._absolute {
             mouse_mode::absolute
         } else {
@@ -78,7 +104,7 @@ impl mode {
         }
     }
 
-    fn get_main_hand(&self) -> main_hand {
+    pub fn get_main_hand(&self) -> main_hand {
         if self._left_handed {
             main_hand::left
         } else {
@@ -116,5 +142,3 @@ impl config {
 
     fn calibrate(&mut self) {}
 }
-
-thread_local!( pub(crate) static CONFIG: config = config::new());

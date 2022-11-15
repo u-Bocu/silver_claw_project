@@ -112,50 +112,23 @@ impl hand_state {
 }
 
 /**
- * Screen dimensions singleton.
- *
- * /!\ Windows only for now.
- * TODO: Get screen info for MacOS and Ubuntu.
- */
-
-struct screen_info {
-    _dimensions: Option<(f32, f32)>,
-}
-
-static mut SCREEN_INFO: screen_info = screen_info { _dimensions: None };
-
-/**
  * Returns the position where the mouse should be placed on the screen,
  * according to the hand coordinates.
  */
 fn compute_wrist_pos(landmarks_coordinates: &Vec<(f32, f32, f32)>) -> (i32, i32) {
-    unsafe {
-        match SCREEN_INFO._dimensions {
-            Some(_a) => (),
-            None => {
-                #[cfg(target_family = "windows")]
-                {
-                    SCREEN_INFO._dimensions = Some((
-                        winuser::GetSystemMetrics(winuser::SM_CXSCREEN) as f32,
-                        winuser::GetSystemMetrics(winuser::SM_CYSCREEN) as f32,
-                    ));
-                }
+    let screen_width = calibration::SCREEN_INFO.with(|screen_info| screen_info._dimensions.0);
+    let screen_height = calibration::SCREEN_INFO.with(|screen_info| screen_info._dimensions.1);
 
-                #[cfg(target_family = "unix")]
-                {}
-                #[cfg(target_os = "macos")]
-                {}
-            }
+    let mut is_left_hand: i32 = calibration::CONFIG.with(|config| {
+        if config._mode.get_main_hand() == calibration::main_hand::left {
+            1i32
+        } else {
+            -1i32
         }
-    }
-
-    let screen_width = unsafe { SCREEN_INFO._dimensions.unwrap().0 };
-    let screen_height = unsafe { SCREEN_INFO._dimensions.unwrap().1 };
-
-    let mut is_left_hand: i32 = 1;
+    });
 
     if landmarks_coordinates[1].0 > landmarks_coordinates[0].0 {
-        is_left_hand = -1i32;
+        is_left_hand *= -1i32;
     }
 
     let mut res: (i32, i32) = calibration::CONFIG.with(|config| {
