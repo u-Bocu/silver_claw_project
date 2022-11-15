@@ -88,8 +88,9 @@ fn main() -> PyResult<()> {
 
             #[cfg(debug_assertions)]
             {
-                println!("{:?}", hands.0._state);
-                println!("{:?}", hands.1._state);
+                println!("Hand 0:{:?}", hands.0._state);
+                println!("Hand 1:{:?}", hands.1._state);
+                println!("Last state:{:?}", last_state);
             }
 
             if hands.0._state == hand_detector::state::awake
@@ -134,7 +135,7 @@ fn main() -> PyResult<()> {
                         e.mouse_up(MouseButton::Left);
                     }
                     if hands.0._state == hand_detector::state::asleep
-                        || hands.1._state == hand_detector::state::asleep
+                        && hands.1._state == hand_detector::state::asleep
                     {
                         last_state = hand_detector::state::asleep;
                     }
