@@ -3,6 +3,6 @@
 
 use std::fmt::Error;
 
-fn execute() -> Result<(), Error> {
+pub fn execute() -> Result<(), Error> {
     Ok(())
 }
