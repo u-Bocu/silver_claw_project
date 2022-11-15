@@ -1,7 +1,7 @@
 use winapi::um::winuser;
 
 thread_local!( pub(crate) static CONFIG: config = config::new());
-thread_local!( pub(crate) static SCREEN_INFO: screen_info = screen_info::new());
+thread_local!( pub(crate) static SCREEN_INFO: screen_info = screen_info::default());
 
 /**
  * Screen dimensions singleton.
@@ -11,15 +11,18 @@ pub struct screen_info {
     pub _dimensions: (f32, f32),
 }
 
-impl screen_info {
-    pub fn new() -> Self {
-        screen_info {
-            _dimensions: unsafe {
-                (
-                    winuser::GetSystemMetrics(winuser::SM_CXSCREEN) as f32,
-                    winuser::GetSystemMetrics(winuser::SM_CYSCREEN) as f32,
-                )
-            },
+impl Default for screen_info {
+    fn default() -> Self {
+        #[cfg(target_family = "windows")]
+        {
+            screen_info {
+                _dimensions: unsafe {
+                    (
+                        winuser::GetSystemMetrics(winuser::SM_CXSCREEN) as f32,
+                        winuser::GetSystemMetrics(winuser::SM_CYSCREEN) as f32,
+                    )
+                },
+            }
         }
     }
 }
@@ -64,18 +67,6 @@ pub struct mode {
 }
 
 impl mode {
-    pub fn new() -> Self {
-        mode {
-            _absolute: true,
-            _relative: false,
-
-            _left_handed: false,
-            _right_handed: true,
-
-            _gui_on: true,
-        }
-    }
-
     fn set_mouse_mode(&mut self, m: mouse_mode) {
         if m == mouse_mode::absolute {
             self._absolute = true;
@@ -113,6 +104,20 @@ impl mode {
     }
 }
 
+impl Default for mode {
+    fn default() -> Self {
+        mode {
+            _absolute: true,
+            _relative: false,
+
+            _left_handed: false,
+            _right_handed: true,
+
+            _gui_on: true,
+        }
+    }
+}
+
 #[derive(Debug)]
 pub struct config {
     pub _calibration: calibration,
@@ -132,7 +137,7 @@ impl config {
                 x_speed_multiplicator: 10f32 / 5f32,
                 y_speed_multiplicator: 10f32 / 6.5f32,
             },
-            _mode: mode::new(),
+            _mode: mode::default(),
         }
     }
 
@@ -141,4 +146,22 @@ impl config {
     fn save_calibration(&self) {}
 
     fn calibrate(&mut self) {}
+}
+
+impl Default for config {
+    fn default() -> Self {
+        config {
+            _calibration: calibration {
+                x_offset: 250i32,
+                y_offset: 400i32,
+
+                x_offset_multiplicator: 0.25f32,
+                y_offset_multiplicator: 0.35f32,
+
+                x_speed_multiplicator: 10f32 / 5f32,
+                y_speed_multiplicator: 10f32 / 6.5f32,
+            },
+            _mode: mode::default(),
+        }
+    }
 }

@@ -109,7 +109,6 @@ impl circular_buffer {
                  * We use Vec::drain for that.
                  * Hard part is calculating range indexes for drain.
                  */
-
                 let index: usize = match self._index >= self._data.len() {
                     true => self._data.len() - 1,
                     false => match self._index {
