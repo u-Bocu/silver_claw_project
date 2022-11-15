@@ -103,40 +103,42 @@ impl circular_buffer {
         if s > self._data.capacity() {
             self._data.reserve_exact(s - self._data.len());
         } else if s < self._data.capacity() {
-            /*
-             * We need to purge obsolete values in a smart way.
-             * We use Vec::drain for that.
-             * Hard part is calculating range indexes for drain.
-             */
+            if s <= self._data.len() {
+                /*
+                 * We need to purge obsolete values in a smart way.
+                 * We use Vec::drain for that.
+                 * Hard part is calculating range indexes for drain.
+                 */
 
-            let index: usize = match self._index >= self._data.len() {
-                true => self._data.len() - 1,
-                false => match self._index {
-                    0 => self._data.len() - 1,
-                    _ => self._index - 1,
-                },
-            };
+                let index: usize = match self._index >= self._data.len() {
+                    true => self._data.len() - 1,
+                    false => match self._index {
+                        0 => self._data.len() - 1,
+                        _ => self._index - 1,
+                    },
+                };
 
-            let mut i: i32 = index as i32;
+                let mut i: i32 = index as i32;
 
-            for _j in 0..s {
-                i -= 1;
-                if i < 0 {
-                    i = (self._data.len() as i32) - 1;
+                for _j in 0..s {
+                    i -= 1;
+                    if i < 0 {
+                        i = (self._data.len() as i32) - 1;
+                    }
                 }
-            }
 
-            let i: usize = i as usize;
+                let i: usize = i as usize;
 
-            if i < index {
-                self._data = self._data.drain(i..=index).collect();
-            } else if i > index {
-                self._data.drain(index + 1..i);
-            } else {
-                // i == index
-                let tmp: (i32, i32) = self._data.remove(i);
-                self._data.clear();
-                self._data.push(tmp);
+                if i < index {
+                    self._data = self._data.drain(i..=index).collect();
+                } else if i > index {
+                    self._data.drain(index + 1..i);
+                } else {
+                    // i == index
+                    let tmp: (i32, i32) = self._data.remove(i);
+                    self._data.clear();
+                    self._data.push(tmp);
+                }
             }
 
             self._data.shrink_to(s);
