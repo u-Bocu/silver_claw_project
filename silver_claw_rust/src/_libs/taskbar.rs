@@ -2,7 +2,6 @@
 
 extern crate winapi;
 
-use std::borrow::BorrowMut;
 use std::ffi::c_void;
 use std::ffi::{CString, OsStr};
 use std::mem::{size_of, zeroed};
@@ -17,7 +16,7 @@ use winapi::um::winuser::{
 };
 
 const MAGIC_ID: UINT = 2209;
-thread_local!( pub static EXIT: bool = false);
+pub static mut EXIT: bool = false;
 
 /**
  * Window procedure called each time the user interacts with the notification icon.
@@ -35,9 +34,7 @@ unsafe extern "system" fn window_proc(
 
     if (lParam as UINT) == WM_RBUTTONDOWN {
         println!("Right clic on icon");
-        EXIT.with(|mut exit| {
-            *exit.borrow_mut() = &true;
-        });
+        EXIT = true;
     }
 
     return DefWindowProcA(hwnd, uMsg, wParam, lParam);

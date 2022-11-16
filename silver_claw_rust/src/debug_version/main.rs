@@ -53,7 +53,7 @@ fn main() -> PyResult<()> {
 
         // Main Loop
         loop {
-            if taskbar::EXIT.with(|exit| *exit == true) {
+            if unsafe { taskbar::EXIT == true } {
                 break;
             }
             let mut msg: MSG = unsafe { zeroed() };
@@ -105,6 +105,8 @@ fn main() -> PyResult<()> {
 
                 if calibration::CONFIG.with(|config| config.mode.get_mouse_mode())
                     == hand_detector::calibration::mouse_mode::absolute
+                    && (hands.0._state == hand_detector::state::drag
+                        || hands.1._state == hand_detector::state::drag)
                 {
                     e.mouse_move_to(new_position.0, new_position.1);
                 } else {
