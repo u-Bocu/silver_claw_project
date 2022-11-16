@@ -90,11 +90,16 @@ impl hand_state {
                     self._state = state::drag;
                 }
                 gesture::thumb_middle_pinched => {
-                    if landmarks_coordinates[1].0 < landmarks_coordinates[0].0 {
-                        self._state = state::left_clicked;
-                    } else {
-                        self._state = state::right_clicked;
-                    }
+                    self._state = calibration::CONFIG.with(|config| {
+                        if landmarks_coordinates[1].0 < landmarks_coordinates[0].0
+                            && config._mode.get_main_hand() == calibration::main_hand::right
+                        // Default mode is right-handed.
+                        {
+                            state::left_clicked
+                        } else {
+                            state::right_clicked
+                        }
+                    });
                 }
                 gesture::void => {
                     self._state = state::not_detected;
@@ -169,7 +174,7 @@ const RIGHT_CLIC_TRANSITION_RATIO: f32 = 1.75f32;
 
 /**
  * Returns the hand gesture recognized with geometry.
- * Geometry is simpler and quicker than ML in our case.
+ * Geometry is simpler (and quicker?) than ML in our case.
  */
 fn compute_gesture(landmarks_coordinates: &Vec<(f32, f32, f32)>) -> gesture {
     let thumb_index_distance: f32 = f32::sqrt(

@@ -54,7 +54,7 @@ fn main() -> PyResult<()> {
         // Main Loop
         loop {
             if unsafe { taskbar::EXIT == true } {
-                return Ok(());
+                break;
             }
             let mut msg: MSG = unsafe { zeroed() };
 
@@ -68,10 +68,15 @@ fn main() -> PyResult<()> {
                     .extract()?,
             )?;
 
-            hands.1.compute_hand_state(
-                py.eval(code_get_second_hand, None, Some(&locals))?
-                    .extract()?,
-            )?;
+            // TODO: Optimize 2-hand mode (Python is so slow...)
+            if calibration::CONFIG.with(|config| config._mode.get_mouse_mode())
+                == hand_detector::calibration::mouse_mode::absolute
+            {
+                hands.1.compute_hand_state(
+                    py.eval(code_get_second_hand, None, Some(&locals))?
+                        .extract()?,
+                )?;
+            }
 
             #[cfg(debug_assertions)]
             {
@@ -140,5 +145,11 @@ fn main() -> PyResult<()> {
                 }
             }
         }
+
+        calibration::CONFIG.with(|config| {
+            config.save_calibration();
+        });
+
+        Ok(())
     })
 }

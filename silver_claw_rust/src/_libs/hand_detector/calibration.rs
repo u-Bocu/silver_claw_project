@@ -2,6 +2,7 @@
 #![allow(non_camel_case_types)]
 #![warn(non_snake_case)]
 
+use serde::{Deserialize, Serialize};
 use winapi::um::winuser;
 
 thread_local!( pub static CONFIG: config = config::new());
@@ -35,7 +36,7 @@ impl Default for screen_info {
  * Configuration singleton.
  */
 
-#[derive(Debug, PartialEq, Clone, Copy)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Clone, Copy)]
 pub struct calibration {
     pub x_offset: i32,
     pub y_offset: i32,
@@ -59,7 +60,7 @@ pub enum main_hand {
     right,
 }
 
-#[derive(Debug)]
+#[derive(Serialize, Deserialize, Debug, Copy, Clone)]
 pub struct mode {
     _absolute: bool,
     _relative: bool,
@@ -122,7 +123,9 @@ impl Default for mode {
     }
 }
 
-#[derive(Debug)]
+const CONFIG_PATH: &str = "config.yaml";
+
+#[derive(Serialize, Deserialize, Debug, Copy, Clone)]
 pub struct config {
     pub _calibration: calibration,
     pub _mode: mode,
@@ -130,24 +133,31 @@ pub struct config {
 
 impl config {
     pub fn new() -> Self {
-        config {
-            _calibration: calibration {
-                x_offset: 250i32,
-                y_offset: 400i32,
+        let c = config::load_calibration();
 
-                x_offset_multiplicator: 0.25f32,
-                y_offset_multiplicator: 0.35f32,
-
-                x_speed_multiplicator: 10f32 / 5f32,
-                y_speed_multiplicator: 10f32 / 6.5f32,
-            },
-            _mode: mode::default(),
+        // If possible load calibration, if not, set it to default.
+        match c {
+            Ok(c) => c,
+            Err(_) => config::default(),
         }
     }
 
-    fn load_calibration(&mut self) {}
+    fn load_calibration() -> Result<Self, serde_yaml::Error> {
+        let config_data = std::fs::read_to_string(CONFIG_PATH).expect("Unable to read file");
+        serde_yaml::from_str(&config_data)
+    }
 
-    fn save_calibration(&self) {}
+    pub fn save_calibration(&self) {
+        let yaml = serde_yaml::to_string(&self).expect("Unable to convert config to YAML.");
+
+        #[cfg(debug_assertions)]
+        {
+            println!("File Path:{:?}", CONFIG_PATH);
+            println!("Config string:{:?}", yaml);
+        }
+
+        std::fs::write(CONFIG_PATH, yaml).expect("Unable to write to file.");
+    }
 
     fn calibrate(&mut self) {}
 }
