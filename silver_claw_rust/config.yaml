@@ -1,14 +1,14 @@
 # Do not modify this file. Unless you know what you are doing, which is most likely not the case.
-_calibration:
+calibration:
   x_offset: 250
   y_offset: 400
   x_offset_multiplicator: 0.25
   y_offset_multiplicator: 0.35
   x_speed_multiplicator: 2.0
   y_speed_multiplicator: 1.5384616
-_mode:
-  _absolute: true
-  _relative: false
+mode:
+  _absolute: false
+  _relative: true
   _left_handed: false
   _right_handed: true
-  _gui_on: true
+  gui_on: true
