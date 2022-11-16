@@ -53,7 +53,7 @@ fn main() -> PyResult<()> {
 
         // Main Loop
         loop {
-            if unsafe { taskbar::EXIT == true } {
+            if taskbar::EXIT.with(|exit| *exit == true) {
                 break;
             }
             let mut msg: MSG = unsafe { zeroed() };
