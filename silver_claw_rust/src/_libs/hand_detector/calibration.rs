@@ -138,7 +138,7 @@ impl config {
         // If possible load calibration, if not, set it to default.
         match c {
             Ok(c) => c,
-            Err(_) => config::default(),
+            Err(_) => config::calibrate(),
         }
     }
 
@@ -159,7 +159,9 @@ impl config {
         std::fs::write(CONFIG_PATH, yaml).expect("Unable to write to file.");
     }
 
-    fn calibrate(&mut self) {}
+    fn calibrate() -> Self {
+        config::default()
+    }
 }
 
 impl Default for config {
