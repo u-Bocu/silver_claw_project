@@ -92,7 +92,7 @@ impl hand_state {
                 gesture::thumb_middle_pinched => {
                     self._state = calibration::CONFIG.with(|config| {
                         if landmarks_coordinates[1].0 < landmarks_coordinates[0].0
-                            && config._mode.get_main_hand() == calibration::main_hand::right
+                            && config.mode.get_main_hand() == calibration::main_hand::right
                         // Default mode is right-handed.
                         {
                             state::left_clicked
@@ -122,11 +122,11 @@ impl hand_state {
  * according to the hand coordinates.
  */
 fn compute_wrist_pos(landmarks_coordinates: &Vec<(f32, f32, f32)>) -> (i32, i32) {
-    let screen_width = calibration::SCREEN_INFO.with(|screen_info| screen_info._dimensions.0);
-    let screen_height = calibration::SCREEN_INFO.with(|screen_info| screen_info._dimensions.1);
+    let screen_width = calibration::SCREEN_INFO.with(|screen_info| screen_info.dimensions.0);
+    let screen_height = calibration::SCREEN_INFO.with(|screen_info| screen_info.dimensions.1);
 
     let mut is_left_hand: i32 = calibration::CONFIG.with(|config| {
-        if config._mode.get_main_hand() == calibration::main_hand::left {
+        if config.mode.get_main_hand() == calibration::main_hand::left {
             1i32
         } else {
             -1i32
@@ -140,15 +140,14 @@ fn compute_wrist_pos(landmarks_coordinates: &Vec<(f32, f32, f32)>) -> (i32, i32)
     let mut res: (i32, i32) = calibration::CONFIG.with(|config| {
         (
             ((((screen_width - landmarks_coordinates[0].0 * screen_width)
-                * config._calibration.x_speed_multiplicator)
-                - (screen_width * config._calibration.x_offset_multiplicator)) as i32)
-                + (is_left_hand * config._calibration.x_offset),
+                * config.calibration.x_speed_multiplicator)
+                - (screen_width * config.calibration.x_offset_multiplicator)) as i32)
+                + (is_left_hand * config.calibration.x_offset),
             (((landmarks_coordinates[0].1
                 * screen_height
-                * config._calibration.y_speed_multiplicator)
-                - (screen_height * config._calibration.y_offset_multiplicator))
-                as i32)
-                - config._calibration.y_offset,
+                * config.calibration.y_speed_multiplicator)
+                - (screen_height * config.calibration.y_offset_multiplicator)) as i32)
+                - config.calibration.y_offset,
         )
     });
 

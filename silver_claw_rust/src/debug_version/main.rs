@@ -69,7 +69,7 @@ fn main() -> PyResult<()> {
             )?;
 
             // TODO: Optimize 2-hand mode (Python is so slow...)
-            if calibration::CONFIG.with(|config| config._mode.get_mouse_mode())
+            if calibration::CONFIG.with(|config| config.mode.get_mouse_mode())
                 == hand_detector::calibration::mouse_mode::absolute
             {
                 hands.1.compute_hand_state(
@@ -103,7 +103,7 @@ fn main() -> PyResult<()> {
                     },
                 };
 
-                if calibration::CONFIG.with(|config| config._mode.get_mouse_mode())
+                if calibration::CONFIG.with(|config| config.mode.get_mouse_mode())
                     == hand_detector::calibration::mouse_mode::absolute
                 {
                     e.mouse_move_to(new_position.0, new_position.1);

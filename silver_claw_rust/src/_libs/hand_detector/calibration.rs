@@ -13,7 +13,7 @@ thread_local!( pub(crate) static SCREEN_INFO: screen_info = screen_info::default
  */
 
 pub struct screen_info {
-    pub _dimensions: (f32, f32),
+    pub dimensions: (f32, f32),
 }
 
 impl Default for screen_info {
@@ -21,7 +21,7 @@ impl Default for screen_info {
         #[cfg(target_family = "windows")]
         {
             screen_info {
-                _dimensions: unsafe {
+                dimensions: unsafe {
                     (
                         winuser::GetSystemMetrics(winuser::SM_CXSCREEN) as f32,
                         winuser::GetSystemMetrics(winuser::SM_CYSCREEN) as f32,
@@ -68,7 +68,7 @@ pub struct mode {
     _left_handed: bool,
     _right_handed: bool,
 
-    pub _gui_on: bool,
+    pub gui_on: bool,
 }
 
 impl mode {
@@ -118,7 +118,7 @@ impl Default for mode {
             _left_handed: false,
             _right_handed: true,
 
-            _gui_on: true,
+            gui_on: true,
         }
     }
 }
@@ -127,8 +127,8 @@ const CONFIG_PATH: &str = "config.yaml";
 
 #[derive(Serialize, Deserialize, Debug, Copy, Clone)]
 pub struct config {
-    pub _calibration: calibration,
-    pub _mode: mode,
+    pub calibration: calibration,
+    pub mode: mode,
 }
 
 impl config {
@@ -156,6 +156,8 @@ impl config {
             println!("Config string:{:?}", yaml);
         }
 
+        let comment: String = String::from("# Do not modify this file. Unless you know what you are doing, which is most likely not the case.\n");
+        let yaml = comment + &yaml;
         std::fs::write(CONFIG_PATH, yaml).expect("Unable to write to file.");
     }
 
@@ -167,7 +169,7 @@ impl config {
 impl Default for config {
     fn default() -> Self {
         config {
-            _calibration: calibration {
+            calibration: calibration {
                 x_offset: 250i32,
                 y_offset: 400i32,
 
@@ -177,7 +179,7 @@ impl Default for config {
                 x_speed_multiplicator: 10f32 / 5f32,
                 y_speed_multiplicator: 10f32 / 6.5f32,
             },
-            _mode: mode::default(),
+            mode: mode::default(),
         }
     }
 }
