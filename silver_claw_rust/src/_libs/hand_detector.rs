@@ -81,11 +81,14 @@ impl hand_state {
                     self._buffer.reevaluate_size();
 
                     let wrist_pos = self._buffer.mean_filter();
-                    self._shift = match self._wrist_pos {
-                        Some(pos) => Some((wrist_pos.0 - pos.0, wrist_pos.1 - pos.1)),
-                        None => None,
-                    };
+                    self._shift = self._buffer.get_shift();
                     self._wrist_pos = Some(wrist_pos);
+
+                    #[cfg(debug_assertions)]
+                    {
+                        println!("Buffer: {:?}", self._buffer);
+                        println!("Shift: {:?}", self._shift);
+                    }
 
                     self._state = state::drag;
                 }
@@ -101,10 +104,17 @@ impl hand_state {
                         }
                     });
                 }
+                gesture::none => {
+                    self._state = state::awake;
+                }
                 gesture::void => {
                     self._state = state::not_detected;
                 }
                 _ => {}
+            }
+
+            if (_gesture != gesture::thumb_index_pinched) && (_gesture != gesture::transition) {
+                self._buffer.clear();
             }
         }
 

@@ -42,6 +42,11 @@ impl circular_buffer {
         }
     }
 
+    pub fn clear(&mut self) {
+        self._data.clear();
+        self.resize(BUFFER_DEFAULT_SIZE);
+    }
+
     /**
      * Condidering cursor acceleration, this functions resizes the buffer to get either precision or responsivity.
      *
@@ -213,6 +218,29 @@ impl circular_buffer {
                             + (speeds[round::floor(speeds_size / 2f64, 0i8) as usize].1
                                 - speeds.last().unwrap().1)
                                 .abs();
+                    Some(acceleration)
+                } else {
+                    None
+                }
+            }
+            None => None,
+        }
+    }
+
+    pub fn get_shift(&self) -> Option<(i32, i32)> {
+        let speeds: Option<Vec<(i32, i32)>> = self.get_speeds();
+
+        match speeds {
+            Some(speeds) => {
+                let speeds_size: f64 = speeds.len() as f64;
+
+                if speeds_size > 1f64 {
+                    let acceleration = (
+                        (speeds[round::floor(speeds_size / 2f64, 0i8) as usize].0
+                            - speeds.last().unwrap().0),
+                        (speeds[round::floor(speeds_size / 2f64, 0i8) as usize].1
+                            - speeds.last().unwrap().1),
+                    );
                     Some(acceleration)
                 } else {
                     None
