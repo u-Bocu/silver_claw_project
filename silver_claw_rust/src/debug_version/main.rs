@@ -78,17 +78,6 @@ fn main() -> PyResult<()> {
                 )?;
             }
 
-            #[cfg(debug_assertions)]
-            {
-                println!("Hand 0:{:?}", hands.0._state);
-                if calibration::CONFIG.with(|config| config.mode.get_mouse_mode())
-                    == hand_detector::calibration::mouse_mode::absolute
-                {
-                    println!("Hand 1:{:?}", hands.1._state);
-                }
-                println!("Last state:{:?}", last_state);
-            }
-
             if hands.0._state == hand_detector::state::awake
                 || hands.1._state == hand_detector::state::awake
             {
@@ -96,15 +85,31 @@ fn main() -> PyResult<()> {
             }
 
             if last_state != hand_detector::state::asleep {
-                let new_position: (i32, i32) = match hands.0._wrist_pos {
-                    Some(pos0) => match hands.1._wrist_pos {
-                        Some(pos1) => ((pos0.0 + pos1.0) / 2, (pos0.1 + pos1.1) / 2),
-                        None => pos0,
-                    },
-                    None => match hands.1._wrist_pos {
-                        Some(pos1) => pos1,
-                        None => (0i32, 0i32),
-                    },
+
+                let new_position = match calibration::CONFIG.with(|config| config.mode.get_mouse_mode()) {
+                    hand_detector::calibration::mouse_mode::absolute => match hands.0._wrist_pos {
+                        Some(pos0) => match hands.1._wrist_pos {
+                            Some(pos1) => ((pos0.0 + pos1.0) / 2, (pos0.1 + pos1.1) / 2),
+                            None => pos0,
+                        },
+                        None => match hands.1._wrist_pos {
+                            Some(pos1) => pos1,
+                            None => (0i32, 0i32),
+                        },
+                }
+                    hand_detector::calibration::mouse_mode::relative => match hands.0._state {
+                        hand_detector::state::drag => match hands.0._buffer.get_shift() {
+                            Some(pos) => pos,
+                            None => (0i32, 0i32),
+                        },
+                        _ => match hands.1._state {
+                            hand_detector::state::drag => match hands.1._buffer.get_shift() {
+                                Some(pos) => pos,
+                                None => (0i32, 0i32),
+                            },
+                            _ => (0i32, 0i32),
+                        },
+                    }
                 };
 
                 if calibration::CONFIG.with(|config| config.mode.get_mouse_mode())
@@ -113,15 +118,10 @@ fn main() -> PyResult<()> {
                         || hands.1._state == hand_detector::state::drag)
                 {
                     e.mouse_move_to(new_position.0, new_position.1);
+
                 } else if hands.0._state == hand_detector::state::drag
                     || hands.1._state == hand_detector::state::drag
-                {
-                    let current_position = Enigo::mouse_location();
-                    let new_position: (i32, i32) = (
-                        (new_position.0 - current_position.0),
-                        (new_position.1 - current_position.1),
-                    );
-
+                {                    
                     e.mouse_move_relative(new_position.0, new_position.1);
                 }
 

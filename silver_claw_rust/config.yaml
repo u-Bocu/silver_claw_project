@@ -9,6 +9,6 @@ calibration:
 mode:
   _absolute: false
   _relative: true
-  _left_handed: false
-  _right_handed: true
+  _left_handed: true
+  _right_handed: false
   gui_on: true

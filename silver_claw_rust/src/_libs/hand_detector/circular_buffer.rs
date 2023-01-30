@@ -47,6 +47,8 @@ impl circular_buffer {
         self.resize(BUFFER_DEFAULT_SIZE);
     }
 
+    // TODO: Find a better function to reevalute size.
+
     /**
      * Condidering cursor acceleration, this functions resizes the buffer to get either precision or responsivity.
      *
@@ -110,7 +112,7 @@ impl circular_buffer {
                 /*
                  * We need to purge obsolete values in a smart way.
                  * We use Vec::drain for that.
-                 * Hard part is calculating range indexes for drain.
+                 * The hard part is calculating range indexes for drain.
                  */
                 let index: usize = match self._index >= self._data.len() {
                     true => self._data.len() - 1,

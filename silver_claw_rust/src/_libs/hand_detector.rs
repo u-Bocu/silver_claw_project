@@ -84,12 +84,6 @@ impl hand_state {
                     self._shift = self._buffer.get_shift();
                     self._wrist_pos = Some(wrist_pos);
 
-                    #[cfg(debug_assertions)]
-                    {
-                        println!("Buffer: {:?}", self._buffer);
-                        println!("Shift: {:?}", self._shift);
-                    }
-
                     self._state = state::drag;
                 }
                 gesture::thumb_middle_pinched => {
@@ -113,7 +107,7 @@ impl hand_state {
                 _ => {}
             }
 
-            if (_gesture != gesture::thumb_index_pinched) && (_gesture != gesture::transition) {
+            if self._state != state::drag {
                 self._buffer.clear();
             }
         }
