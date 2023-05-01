@@ -13,7 +13,7 @@ path = "src/installer/main.rs"
 
 [[bin]]
 name = "silver_claw_debug_version"
-path = "src/debug_version/main.rs"
+path = "src/unbugged_version/main.rs"
 
 [[bin]]
 name = "silver_claw_unit_tests"
